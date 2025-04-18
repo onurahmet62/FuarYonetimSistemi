@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35913.81 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuarYonetimSistemi.API", "FuarYonetimSistemi.API\FuarYonetimSistemi.API.csproj", "{DD3DE130-BBBF-4747-BBA9-65A4460990AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuarYonetimSistemi.Application", "FuarYonetimSistemi.Application\FuarYonetimSistemi.Application.csproj", "{16843747-6976-44C1-A22C-DE37C6ECF9D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuarYonetimSistemi.Domain", "FuarYonetimSistemi.Domain\FuarYonetimSistemi.Domain.csproj", "{E3CC6690-0F5C-4067-831F-99DB4B6E47BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuarYonetimSistemi.Infrastructure", "FuarYonetimSistemi.Infrastructure\FuarYonetimSistemi.Infrastructure.csproj", "{E1D8F630-F795-4663-AA4F-2528FD01E395}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD3DE130-BBBF-4747-BBA9-65A4460990AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD3DE130-BBBF-4747-BBA9-65A4460990AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD3DE130-BBBF-4747-BBA9-65A4460990AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD3DE130-BBBF-4747-BBA9-65A4460990AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16843747-6976-44C1-A22C-DE37C6ECF9D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16843747-6976-44C1-A22C-DE37C6ECF9D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16843747-6976-44C1-A22C-DE37C6ECF9D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16843747-6976-44C1-A22C-DE37C6ECF9D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3CC6690-0F5C-4067-831F-99DB4B6E47BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3CC6690-0F5C-4067-831F-99DB4B6E47BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3CC6690-0F5C-4067-831F-99DB4B6E47BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3CC6690-0F5C-4067-831F-99DB4B6E47BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1D8F630-F795-4663-AA4F-2528FD01E395}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1D8F630-F795-4663-AA4F-2528FD01E395}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1D8F630-F795-4663-AA4F-2528FD01E395}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1D8F630-F795-4663-AA4F-2528FD01E395}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9F196A80-117C-40D1-A9A5-6D7390FD734C}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,6 @@
+@FuarYonetimSistemi.API_HostAddress = http://localhost:5022
+
+GET {{FuarYonetimSistemi.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
