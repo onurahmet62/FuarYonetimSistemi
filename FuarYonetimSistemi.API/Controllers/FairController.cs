@@ -85,6 +85,26 @@ namespace FuarYonetimSistemi.API.Controllers
 
             return NoContent();
         }
+
+
+        // POST: api/Fair/filter
+        [HttpPost("filter")]
+        [Authorize(Roles = "Admin,Manager,SalesPerson,Customer")]
+        public async Task<IActionResult> GetFilteredFairs([FromBody] FairFilterDto filterDto)
+        {
+            var (fairs, totalCount) = await _fairService.GetFilteredFairsAsync(filterDto);
+            return Ok(new { fairs, totalCount });
+        }
+
+        // POST: api/Fair/export
+        [HttpPost("export")]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> ExportFairsToExcel([FromBody] FairFilterDto filterDto)
+        {
+            var excelBytes = await _fairService.ExportFairsToExcelAsync(filterDto);
+            return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Fuarlar.xlsx");
+        }
+
     }
 
 }

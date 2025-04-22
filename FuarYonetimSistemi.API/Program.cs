@@ -1,15 +1,14 @@
 ﻿using FuarYonetimSistemi.Application.Interfaces;
 using FuarYonetimSistemi.Application.Services;
 using FuarYonetimSistemi.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using FuarYonetimSistemi.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using FuarYonetimSistemi.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -78,6 +77,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+// Allow all origins (CORS) for now (only for development/staging)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()     // Her yerden gelen istekler kabul edilir
+              .AllowAnyHeader()    // Herhangi bir header'la gelen istekler kabul edilir
+              .AllowAnyMethod();   // Herhangi bir HTTP method'uyla gelen istekler kabul edilir
+    });
+});
+
 var app = builder.Build();
 
 // HTTP pipeline configuration
@@ -88,9 +98,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication(); // Authentication middleware
 app.UseAuthorization();  // Authorization middleware
+
+app.UseCors("AllowAll"); // Enable CORS policy
 
 app.MapControllers();
 
