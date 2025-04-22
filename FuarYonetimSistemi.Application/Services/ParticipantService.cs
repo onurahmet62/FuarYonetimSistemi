@@ -29,6 +29,8 @@ namespace FuarYonetimSistemi.Application.Services
                 FullName = dto.FullName,
                 Email = dto.Email,
                 Phone = dto.Phone,
+                CreateDate = DateTime.UtcNow,
+                AuthFullName = dto.AuthFullName,
                 IsDeleted = false
             };
 
@@ -40,7 +42,9 @@ namespace FuarYonetimSistemi.Application.Services
                 Id = participant.Id,
                 FullName = participant.FullName,
                 Email = participant.Email,
-                Phone = participant.Phone
+                Phone = participant.Phone,
+                CreateDate = participant.CreateDate,
+                AuthFullName = participant.AuthFullName
             };
         }
 
@@ -53,6 +57,9 @@ namespace FuarYonetimSistemi.Application.Services
             participant.FullName = dto.FullName;
             participant.Email = dto.Email;
             participant.Phone = dto.Phone;
+            participant.AuthFullName = dto.AuthFullName;
+            participant.CreateDate = DateTime.UtcNow;
+
 
             await _context.SaveChangesAsync();
 
@@ -61,7 +68,9 @@ namespace FuarYonetimSistemi.Application.Services
                 Id = participant.Id,
                 FullName = participant.FullName,
                 Email = participant.Email,
-                Phone = participant.Phone
+                Phone = participant.Phone,  
+                CreateDate = DateTime.UtcNow,
+                AuthFullName = participant.AuthFullName
             };
         }
 
@@ -90,7 +99,10 @@ namespace FuarYonetimSistemi.Application.Services
                 Id = participant.Id,
                 FullName = participant.FullName,
                 Email = participant.Email,
-                Phone = participant.Phone
+                Phone = participant.Phone, 
+                CreateDate = DateTime.UtcNow,
+                AuthFullName = participant.AuthFullName
+
             };
         }
 
@@ -107,6 +119,64 @@ namespace FuarYonetimSistemi.Application.Services
                 })
                 .ToListAsync();
         }
+
+        public async Task<PagedResult<ParticipantDto>> FilterPagedAsync(ParticipantFilterDto filter)
+        {
+            var query = _context.Participants
+                .Where(p => !p.IsDeleted)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter.FullName))
+                query = query.Where(p => p.FullName.Contains(filter.FullName));
+
+            if (!string.IsNullOrWhiteSpace(filter.Email))
+                query = query.Where(p => p.Email.Contains(filter.Email));
+
+            if (!string.IsNullOrWhiteSpace(filter.Phone))
+                query = query.Where(p => p.Phone.Contains(filter.Phone));
+
+            if (!string.IsNullOrWhiteSpace(filter.AuthFullName))
+                query = query.Where(p => p.AuthFullName.Contains(filter.AuthFullName));
+
+            if (filter.CreateDate.HasValue)
+                query = query.Where(p => p.CreateDate.Date == filter.CreateDate.Value.Date);
+
+            // Dinamik sıralama
+            query = filter.SortBy?.ToLower() switch
+            {
+                "fullname" => filter.IsDescending ? query.OrderByDescending(p => p.FullName) : query.OrderBy(p => p.FullName),
+                "email" => filter.IsDescending ? query.OrderByDescending(p => p.Email) : query.OrderBy(p => p.Email),
+                "phone" => filter.IsDescending ? query.OrderByDescending(p => p.Phone) : query.OrderBy(p => p.Phone),
+                "authfullname" => filter.IsDescending ? query.OrderByDescending(p => p.AuthFullName) : query.OrderBy(p => p.AuthFullName),
+                "createdate" => filter.IsDescending ? query.OrderByDescending(p => p.CreateDate) : query.OrderBy(p => p.CreateDate),
+                _ => filter.IsDescending ? query.OrderByDescending(p => p.CreateDate) : query.OrderBy(p => p.CreateDate)
+            };
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(p => new ParticipantDto
+                {
+                    Id = p.Id,
+                    FullName = p.FullName,
+                    Email = p.Email,
+                    Phone = p.Phone,
+                    CreateDate = p.CreateDate,
+                    AuthFullName = p.AuthFullName
+                })
+                .ToListAsync();
+
+            return new PagedResult<ParticipantDto>
+            {
+                Items = items,
+                TotalCount = totalCount
+            };
+        }
+
+
+
     }
 
 

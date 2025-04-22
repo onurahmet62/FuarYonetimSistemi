@@ -13,8 +13,8 @@ namespace FuarYonetimSistemi.Application.DTOs
         public int Year { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-      
 
+        public string Organizer { get; set; }
         public Guid? CategoryId { get; set; } // Mevcut kategori seçimi için
         public string NewCategoryName { get; set; } // Yeni kategori eklemek için
     }

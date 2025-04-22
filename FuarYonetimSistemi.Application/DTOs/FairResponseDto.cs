@@ -10,6 +10,7 @@ namespace FuarYonetimSistemi.Application.DTOs
     {
         public Guid Id { get; set; }  // Fuar ID'si
         public string Name { get; set; }  // Fuar adı
+        public string Organizer { get; set; }
         public DateTime StartDate { get; set; }  // Başlangıç tarihi
         public DateTime EndDate { get; set; }  // Bitiş tarihi
         public bool IsDeleted { get; set; }  // Fuar silinmiş mi?

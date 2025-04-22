@@ -15,6 +15,9 @@ namespace FuarYonetimSistemi.Domain.Entities
 
         public bool IsDeleted { get; set; }  // Silinmiş kontrolü için
 
+        public DateTime CreateDate { get; set; }
+        public string AuthFullName { get; set; }
+
         public ICollection<Stand> Stands { get; set; } = new List<Stand>();
 
     }

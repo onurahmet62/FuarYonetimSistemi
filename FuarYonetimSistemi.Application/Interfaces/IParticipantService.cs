@@ -15,6 +15,8 @@ namespace FuarYonetimSistemi.Application.Interfaces
         Task<bool> DeleteAsync(Guid id);
         Task<ParticipantDto> GetByIdAsync(Guid id);
         Task<IEnumerable<ParticipantDto>> GetAllAsync();
+     
+        Task<PagedResult<ParticipantDto>> FilterPagedAsync(ParticipantFilterDto filter);
     }
 
 }

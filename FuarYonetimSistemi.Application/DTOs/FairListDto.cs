@@ -12,7 +12,7 @@ namespace FuarYonetimSistemi.Application.DTOs
         public string Name { get; set; }  // Fuar adı
         public int Year { get; set; }
 
-       
+        public string Organizer { get; set; }
         public int MaxStandCount { get; set; }
         public DateTime StartDate { get; set; }  // Başlangıç tarihi
         public DateTime EndDate { get; set; }  // Bitiş tarihi

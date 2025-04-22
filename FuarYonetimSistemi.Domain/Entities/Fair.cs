@@ -12,6 +12,7 @@ namespace FuarYonetimSistemi.Domain.Entities
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
+        public string Organizer { get; set; }
         public int Year { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

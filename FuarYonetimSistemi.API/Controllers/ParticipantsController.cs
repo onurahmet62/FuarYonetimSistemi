@@ -60,6 +60,14 @@ namespace FuarYonetimSistemi.API.Controllers
 
             return NoContent();
         }
+
+       
+        [HttpPost("paged")]
+        public async Task<IActionResult> GetPaged([FromBody] ParticipantFilterDto filter)
+        {
+            var result = await _participantService.FilterPagedAsync(filter);
+            return Ok(result);
+        }
     }
 
 }
