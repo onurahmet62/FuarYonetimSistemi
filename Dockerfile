@@ -1,21 +1,27 @@
-# Build aşaması
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
-
-# Proje dosyalarını doğru kopyala
-COPY . .
-
-# .csproj yolunun doğru olduğuna emin olalım
-RUN ls /src/FuarYonetimSistemi/FuarYonetimSistemi.API
-
-# .csproj dosyasını publish et
-RUN dotnet publish FuarYonetimSistemi/FuarYonetimSistemi.API/FuarYonetimSistemi.API.csproj -c Release -o /app/out
-
-# Runtime aşaması
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+# Base image (dotnet sdk)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-COPY --from=build /app/out .
+EXPOSE 80
 
-EXPOSE 5000
+# Build image (dotnet sdk)
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["FuarYonetimSistemi.API/FuarYonetimSistemi.API.csproj", "FuarYonetimSistemi.API/"]
+COPY ["FuarYonetimSistemi.Application/FuarYonetimSistemi.Application.csproj", "FuarYonetimSistemi.Application/"]
+COPY ["FuarYonetimSistemi.Domain/FuarYonetimSistemi.Domain.csproj", "FuarYonetimSistemi.Domain/"]
+COPY ["FuarYonetimSistemi.Infrastructure/FuarYonetimSistemi.Infrastructure.csproj", "FuarYonetimSistemi.Infrastructure/"]
+COPY ["FuarYonetimSistemi.Persistence/FuarYonetimSistemi.Persistence.csproj", "FuarYonetimSistemi.Persistence/"]
+RUN dotnet restore "FuarYonetimSistemi.API/FuarYonetimSistemi.API.csproj"
 
+COPY . .
+WORKDIR "/src/FuarYonetimSistemi.API"
+RUN dotnet build "FuarYonetimSistemi.API.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "FuarYonetimSistemi.API.csproj" -c Release -o /app/publish
+
+# Final stage
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "FuarYonetimSistemi.API.dll"]
