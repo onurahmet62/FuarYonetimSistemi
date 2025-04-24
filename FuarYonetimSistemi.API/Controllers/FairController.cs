@@ -89,7 +89,7 @@ namespace FuarYonetimSistemi.API.Controllers
 
         // POST: api/Fair/filter
         [HttpPost("filter")]
-        [Authorize(Roles = "Admin,Manager,SalesPerson,Customer")]
+        [Authorize(Roles = "Admin,Manager,SalesPerson")]
         public async Task<IActionResult> GetFilteredFairs([FromBody] FairFilterDto filterDto)
         {
             var (fairs, totalCount) = await _fairService.GetFilteredFairsAsync(filterDto);
@@ -104,6 +104,17 @@ namespace FuarYonetimSistemi.API.Controllers
             var excelBytes = await _fairService.ExportFairsToExcelAsync(filterDto);
             return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Fuarlar.xlsx");
         }
+
+
+        // GET: api/Fair/participant/{participantId}
+        [HttpGet("participant/{participantId}")]
+        [Authorize(Roles = "Admin,Manager,SalesPerson")]
+        public async Task<IActionResult> GetFairsByParticipant(Guid participantId)
+        {
+            var fairs = await _fairService.GetFairsByParticipantIdAsync(participantId);
+            return Ok(fairs);
+        }
+
 
     }
 

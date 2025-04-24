@@ -139,5 +139,36 @@ namespace FuarYonetimSistemi.WebApi.Controllers
                 return BadRequest(new { message = ex.Message });  // Hata durumunda mesaj dönüyoruz
             }
         }
+
+        [HttpGet("filter")]
+        [Authorize(Roles = "Admin,Manager,SalesPerson")]
+        public async Task<ActionResult<List<StandDto>>> GetStandsAsync([FromQuery] StandFilterDto filterDto)
+        {
+            try
+            {
+                var stands = await _standService.GetStandsAsync(filterDto);
+                return Ok(stands);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("upcoming-payments")]
+        public async Task<IActionResult> GetStandsWithUpcomingDueDate([FromQuery] int days)
+        {
+            var stands = await _standService.GetStandsWithUpcomingDueDateAsync(days);
+            return Ok(stands);
+        }
+
+        [HttpGet("unpaid")]
+        public async Task<IActionResult> GetUnpaidStands()
+        {
+            var unpaidStands = await _standService.GetUnpaidStandsAsync();
+            return Ok(unpaidStands);
+        }
+
+
     }
 }

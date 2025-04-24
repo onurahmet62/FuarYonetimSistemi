@@ -1,4 +1,5 @@
 ﻿using FuarYonetimSistemi.Application.DTOs;
+using FuarYonetimSistemi.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,5 +30,11 @@ namespace FuarYonetimSistemi.Application.Interfaces
 
         // Stand detaylarını alma
         Task<StandDto> GetStandByIdAsync(Guid standId);
+
+        Task<List<StandDto>> GetStandsAsync(StandFilterDto filterDto);
+
+        Task<List<Stand>> GetStandsWithUpcomingDueDateAsync(int days);
+        Task<List<Stand>> GetUnpaidStandsAsync();
+
     }
 }

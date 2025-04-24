@@ -17,6 +17,8 @@ namespace FuarYonetimSistemi.Application.Interfaces
         Task<bool> DeleteFairAsync(Guid id);
         Task<(IEnumerable<FairDto> fairs, int totalCount)> GetFilteredFairsAsync(FairFilterDto filterDto);
         Task<byte[]> ExportFairsToExcelAsync(FairFilterDto filterDto);
+        Task<IEnumerable<FairParticipationDto>> GetFairsByParticipantIdAsync(Guid participantId);
+
 
     }
 

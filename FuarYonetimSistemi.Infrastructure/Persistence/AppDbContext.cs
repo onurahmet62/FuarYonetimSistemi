@@ -7,44 +7,49 @@ namespace FuarYonetimSistemi.Infrastructure.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        // DbSet'ler: Veritabanı tablosu ile ilişkilendirilmiş model sınıfları
+        // DbSet'ler
         public DbSet<User> Users { get; set; }
         public DbSet<Participant> Participants { get; set; }
         public DbSet<Fair> Fairs { get; set; }
         public DbSet<Stand> Stands { get; set; }
-     
-       
-        public DbSet<Category> Categories { get; set; } // Add DbSet for Category
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
-        // Veritabanı model yapılandırması
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // User - UserRole
-            modelBuilder.Entity<User>()
-                .Property(u => u.Role)
-                .HasConversion<int>();
-
-            // Fuar (Fair) - Stand ilişkilendirmesi
-            modelBuilder.Entity<Fair>()
-                .HasMany(f => f.Stands)
-                .WithOne(s => s.Fair)
-                .HasForeignKey(s => s.FairId);
-
-            // Stand - Participant ilişkilendirmesi
+            // Stand precision settings
             modelBuilder.Entity<Stand>()
-                .HasOne(s => s.Participant)
-                .WithMany(p => p.Stands)
-                .HasForeignKey(s => s.ParticipantId)
-                .OnDelete(DeleteBehavior.Cascade); // Katılımcı silindiğinde ilgili Stand'lar silinsin
+                .Property(s => s.Price)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.AmountPaid)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.AmountRemaining)
+                .HasPrecision(18, 2);
 
-            // Fuar (Fair) - Category ilişkilendirmesi
-            modelBuilder.Entity<Fair>()
-                .HasOne(f => f.Category)
-                .WithMany(c => c.Fairs)
-                .HasForeignKey(f => f.CategoryId)
-                .OnDelete(DeleteBehavior.Restrict); // Category silindiğinde ilgili Fuar'lar silinmesin
+            // Payment precision
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.Amount)
+                .HasPrecision(18, 2);
+
+            // Configure Payment -> Stand relationship with NO ACTION on delete
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Stand)
+                .WithMany(s => s.Payments)
+                .HasForeignKey(p => p.StandId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+           
+
+            // Configure Payment -> Participant relationship if needed
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Participant)
+                .WithMany()
+                .HasForeignKey(p => p.ParticipantId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
     }

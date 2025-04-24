@@ -198,6 +198,27 @@ namespace FuarYonetimSistemi.Application.Services
 
             return package.GetAsByteArray();
         }
+
+        public async Task<IEnumerable<FairParticipationDto>> GetFairsByParticipantIdAsync(Guid participantId)
+        {
+            return await _context.Stands
+                .Include(s => s.Fair).ThenInclude(f => f.Category)
+                .Where(s => s.ParticipantId == participantId && !s.Fair.IsDeleted)
+                .Select(s => new FairParticipationDto
+                {
+                    FairId = s.Fair.Id,
+                    FairName = s.Fair.Name,
+                    Location = s.Fair.Location,
+                    Year = s.Fair.Year,
+                    StartDate = s.Fair.StartDate,
+                    EndDate = s.Fair.EndDate,
+                    Organizer = s.Fair.Organizer,
+                    CategoryName = s.Fair.Category != null ? s.Fair.Category.Name : null
+                })
+                .Distinct()
+                .ToListAsync();
+        }
+
     }
 
 }

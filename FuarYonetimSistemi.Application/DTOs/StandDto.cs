@@ -10,6 +10,7 @@ namespace FuarYonetimSistemi.Application.DTOs
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string FairHall { get; set; }
         public decimal Price { get; set; }
         public double Area { get; set; }
         public string Description { get; set; }
