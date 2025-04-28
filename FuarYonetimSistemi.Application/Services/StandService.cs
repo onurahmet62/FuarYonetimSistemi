@@ -21,282 +21,161 @@ namespace FuarYonetimSistemi.Application.Services
             _context = context;
         }
 
-        // Stand oluşturma
-        public async Task<StandDto> CreateStandAsync(StandCreateDto standCreateDto)
+        public async Task<Stand> AddAsync(StandCreateDto standCreateDto)
         {
+            // Katılımcı ve fuar bilgilerini mevcut ID'lerden alalım
+            var participant = await _context.Participants.FindAsync(standCreateDto.ParticipantId);
+            var fair = await _context.Fairs.FindAsync(standCreateDto.FairId);
+
+            if (participant == null || fair == null)
+            {
+                return null;  // Katılımcı veya fuar bulunamadı
+            }
+
             var stand = new Stand
             {
-                Id = Guid.NewGuid(),
                 Name = standCreateDto.Name,
                 FairHall = standCreateDto.FairHall,
-                Price = standCreateDto.Price,
-                Area = standCreateDto.Area, // decimal olarak kaydedilecek
-                FairId = standCreateDto.FairId,
-                ParticipantId = standCreateDto.ParticipantId,
-                Description = standCreateDto.Description,
-                PaymentStatus = PaymentStatus.PaymentNotReceived.ToString(),  // Enum'daki mevcut değeri kullanın
-                AmountPaid = standCreateDto.AmountPaid,
-                AmountRemaining = standCreateDto.AmountRemaining,
-                DueDate = standCreateDto.DueDate
-          
-                    
+                AreaSold = standCreateDto.AreaSold,
+                AreaExchange = standCreateDto.AreaExchange,
+                ContractArea = standCreateDto.ContractArea,
+                UnitPrice = standCreateDto.UnitPrice,
+                SaleAmountWithoutVAT = standCreateDto.SaleAmountWithoutVAT,
+                ElectricityConnectionFee = standCreateDto.ElectricityConnectionFee,
+                ThirdPartyInsuranceShare = standCreateDto.ThirdPartyInsuranceShare,
+                StandSetupIncome = standCreateDto.StandSetupIncome,
+                SolidWasteFee = standCreateDto.SolidWasteFee,
+                AdvertisingIncome = standCreateDto.AdvertisingIncome,
+                ContractAmountWithoutVAT = standCreateDto.ContractAmountWithoutVAT,
+                VAT10Amount = standCreateDto.VAT10Amount,
+                VAT20Amount = standCreateDto.VAT20Amount,
+                StampTaxAmount = standCreateDto.StampTaxAmount,
+                TotalAmountWithVAT = standCreateDto.TotalAmountWithVAT,
+                TotalReturnInvoice = standCreateDto.TotalReturnInvoice,
+                BarterInvoiceAmount = standCreateDto.BarterInvoiceAmount,
+                CashCollection = standCreateDto.CashCollection,
+                DocumentCollection = standCreateDto.DocumentCollection,
+                Balance = standCreateDto.Balance,
+                ReceivablesInLaw = standCreateDto.ReceivablesInLaw,
+                CollectibleBalance = standCreateDto.CollectibleBalance,
+                BarterAmount = standCreateDto.BarterAmount,
+                BarterBalance = standCreateDto.BarterBalance,
+                ActualDueDate = standCreateDto.ActualDueDate,
+                ContractDate = standCreateDto.ContractDate,
+                SalesRepresentative = standCreateDto.SalesRepresentative,
+                Note = standCreateDto.Note,
+                ParticipantId = standCreateDto.ParticipantId,  // Katılımcı ID'sini ekliyoruz
+                FairId = standCreateDto.FairId  // Fuar ID'sini ekliyoruz
             };
 
-            await _context.Stands.AddAsync(stand);
+            _context.Stands.Add(stand);
             await _context.SaveChangesAsync();
 
-            return new StandDto
-            {
-                Id = stand.Id,
-                Name = stand.Name,
-                FairHall = stand.FairHall,
-                Price = stand.Price,  // decimal'den double'a dönüşüm
-                Area = stand.Area,   // decimal'den double'a dönüşüm
-                Description = stand.Description,
-                ParticipantFullName = stand.Participant?.FullName,  // Optional olarak erişim
-                FairName = stand.Fair?.Name,  // Optional olarak erişim
-                PaymentStatus = stand.PaymentStatus.ToString(),  // Enum'dan string'e dönüşüm
-                AmountPaid = stand.AmountPaid,  // decimal'den double'a dönüşüm
-                AmountRemaining = stand.AmountRemaining,  // decimal'den double'a dönüşüm
-                DueDate = stand.DueDate ?? DateTime.MinValue  // Nullable DateTime kontrolü
-              
-            };
+            return stand;
         }
 
 
-        // Stand güncelleme
-        public async Task<StandDto> UpdateStandAsync(StandUpdateDto standUpdateDto)
+
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            var stand = await _context.Stands.FindAsync(standUpdateDto.Id);
+            var stand = await _context.Stands.FindAsync(id);
             if (stand == null)
-                throw new Exception("Stand bulunamadı.");
-
-            stand.Name = standUpdateDto.Name;
-            stand.FairHall = standUpdateDto.FairHall;
-            stand.Price = standUpdateDto.Price;
-            stand.Description = standUpdateDto.Description;
-            stand.Area = standUpdateDto.Area; // decimal olarak kaydedilecek
-            stand.PaymentStatus = standUpdateDto.PaymentStatus;
-            stand.AmountPaid = standUpdateDto.AmountPaid;
-            stand.AmountRemaining = standUpdateDto.AmountRemaining;
-            stand.DueDate = standUpdateDto.DueDate;
-          
-
-
-            _context.Stands.Update(stand);
-            await _context.SaveChangesAsync();
-
-            return new StandDto
             {
-                Id = stand.Id,
-                Name = stand.Name,
-                FairHall = stand.FairHall,
-                Price = stand.Price,
-                Description = stand.Description,
-                ParticipantFullName = stand.Participant?.FullName,
-                FairName = stand.Fair?.Name,
-                PaymentStatus = stand.PaymentStatus.ToString(),
-                AmountPaid = stand.AmountPaid,
-                AmountRemaining = stand.AmountRemaining,
-                DueDate = stand.DueDate ?? DateTime.MinValue
-            };
-        }
+                return false;  // Stand bulunamadı
+            }
 
-        // Stand silme
-        public async Task<bool> DeleteStandAsync(Guid standId)
-        {
-            var stand = await _context.Stands.FindAsync(standId);
-            if (stand == null)
-                return false;
-
+            // Soft delete (silmek yerine, aktif olarak işaretlenebilir)
             _context.Stands.Remove(stand);
             await _context.SaveChangesAsync();
             return true;
         }
 
-        // Bir fuara ait standları listeleme
-        public async Task<List<StandDto>> GetStandsByFairAsync(Guid fairId)
+        public async Task<IEnumerable<Stand>> FilterAsync(string searchTerm)
         {
-            var stands = await _context.Stands
+            return await _context.Stands
+                .Include(s => s.Participant)
+                .Include(s => s.Fair)
+                .Where(s => s.Name.Contains(searchTerm) || s.FairHall.Contains(searchTerm))
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Stand>> GetAllAsync()
+        {
+            return await _context.Stands
+                .Include(s => s.Participant)  // Katılımcı bilgisi
+                .Include(s => s.Fair)  // Fuar bilgisi
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Stand>> GetByFairIdAsync(Guid fairId)
+        {
+            return await _context.Stands
+                .Include(s => s.Participant)
+                .Include(s => s.Fair)
                 .Where(s => s.FairId == fairId)
-                .Include(s => s.Participant)  // İlişkili veriyi dahil et
-                .Include(s => s.Fair)  // İlişkili veriyi dahil et
                 .ToListAsync();
-
-            return stands.Select(stand => new StandDto
-            {
-                Id = stand.Id,
-                Name = stand.Name,
-                FairHall = stand.FairHall,
-                Price = stand.Price,
-                Area = stand.Area,
-                Description = stand.Description,
-                ParticipantFullName = stand.Participant?.FullName,
-                FairName = stand.Fair?.Name,
-                PaymentStatus = stand.PaymentStatus.ToString(),
-                AmountPaid = stand.AmountPaid,
-                AmountRemaining = stand.AmountRemaining,
-                DueDate = stand.DueDate ?? DateTime.MinValue
-            }).ToList();
         }
 
-        // Bir katılımcıya ait standları listeleme
-        public async Task<List<StandDto>> GetStandsByParticipantAsync(Guid participantId)
+        public async Task<Stand> GetByIdAsync(Guid id)
         {
-            var stands = await _context.Stands
+            return await _context.Stands
+                .Include(s => s.Participant)
+                .Include(s => s.Fair)
+                .FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+        public async Task<IEnumerable<Stand>> GetByParticipantIdAsync(Guid participantId)
+        {
+            return await _context.Stands
+                .Include(s => s.Participant)
+                .Include(s => s.Fair)
                 .Where(s => s.ParticipantId == participantId)
-                .Include(s => s.Participant)
-                .Include(s => s.Fair)
                 .ToListAsync();
-
-            return stands.Select(stand => new StandDto
-            {
-                Id = stand.Id,
-                Name = stand.Name,
-                FairHall = stand.FairHall,
-                Price = stand.Price,
-                Area = stand.Area,
-                Description = stand.Description,
-                ParticipantFullName = stand.Participant?.FullName,
-                FairName = stand.Fair?.Name,
-                PaymentStatus = stand.PaymentStatus.ToString(),
-                AmountPaid = stand.AmountPaid,
-                AmountRemaining = stand.AmountRemaining,
-                DueDate = stand.DueDate ?? DateTime.MinValue
-            }).ToList();
         }
 
-        // Stand ödeme durumu güncelleme
-        public async Task<StandDto> UpdatePaymentStatusAsync(StandPaymentStatusDto paymentStatusDto)
+        public async Task<Stand> UpdateAsync(Guid id, Stand updatedStand)
         {
-            var stand = await _context.Stands.FindAsync(paymentStatusDto.StandId);
+            var stand = await _context.Stands.FindAsync(id);
             if (stand == null)
-                throw new Exception("Stand bulunamadı.");
+            {
+                return null;  // Stand bulunamadı
+            }
 
-            stand.PaymentStatus = paymentStatusDto.PaymentStatus;
-            stand.AmountPaid = paymentStatusDto.AmountPaid;
-            stand.AmountRemaining = paymentStatusDto.AmountRemaining;
-            stand.DueDate = paymentStatusDto.DueDate;
+            // Verileri güncelle
+            stand.Name = updatedStand.Name;
+            stand.FairHall = updatedStand.FairHall;
+            stand.AreaSold = updatedStand.AreaSold;
+            stand.AreaExchange = updatedStand.AreaExchange;
+            stand.ContractArea = updatedStand.ContractArea;
+            stand.UnitPrice = updatedStand.UnitPrice;
+            stand.SaleAmountWithoutVAT = updatedStand.SaleAmountWithoutVAT;
+            stand.ElectricityConnectionFee = updatedStand.ElectricityConnectionFee;
+            stand.ThirdPartyInsuranceShare = updatedStand.ThirdPartyInsuranceShare;
+            stand.StandSetupIncome = updatedStand.StandSetupIncome;
+            stand.SolidWasteFee = updatedStand.SolidWasteFee;
+            stand.AdvertisingIncome = updatedStand.AdvertisingIncome;
+            stand.ContractAmountWithoutVAT = updatedStand.ContractAmountWithoutVAT;
+            stand.VAT10Amount = updatedStand.VAT10Amount;
+            stand.VAT20Amount = updatedStand.VAT20Amount;
+            stand.StampTaxAmount = updatedStand.StampTaxAmount;
+            stand.TotalAmountWithVAT = updatedStand.TotalAmountWithVAT;
+            stand.TotalReturnInvoice = updatedStand.TotalReturnInvoice;
+            stand.BarterInvoiceAmount = updatedStand.BarterInvoiceAmount;
+            stand.CashCollection = updatedStand.CashCollection;
+            stand.DocumentCollection = updatedStand.DocumentCollection;
+            stand.Balance = updatedStand.Balance;
+            stand.ReceivablesInLaw = updatedStand.ReceivablesInLaw;
+            stand.CollectibleBalance = updatedStand.CollectibleBalance;
+            stand.BarterAmount = updatedStand.BarterAmount;
+            stand.BarterBalance = updatedStand.BarterBalance;
+            stand.ActualDueDate = updatedStand.ActualDueDate;
+            stand.ContractDate = updatedStand.ContractDate;
+            stand.SalesRepresentative = updatedStand.SalesRepresentative;
+            stand.Note = updatedStand.Note;
 
-            _context.Stands.Update(stand);
+            // Değişiklikleri kaydet
             await _context.SaveChangesAsync();
-
-            return new StandDto
-            {
-                Id = stand.Id,
-                Name = stand.Name,
-                FairHall = stand.FairHall,
-                Price = stand.Price,
-                Area = stand.Area,
-                Description = stand.Description,
-                ParticipantFullName = stand.Participant?.FullName,
-                FairName = stand.Fair?.Name,
-                PaymentStatus = stand.PaymentStatus.ToString(),
-                AmountPaid = stand.AmountPaid,
-                AmountRemaining = stand.AmountRemaining,
-                DueDate = stand.DueDate ?? DateTime.MinValue
-            };
+            return stand;
         }
-
-        // Stand detaylarını alma
-        public async Task<StandDto> GetStandByIdAsync(Guid standId)
-        {
-            var stand = await _context.Stands
-                .Include(s => s.Participant)  // İlişkili veriyi dahil et
-                .Include(s => s.Fair)  // İlişkili veriyi dahil et
-                .FirstOrDefaultAsync(s => s.Id == standId);
-
-            if (stand == null)
-                throw new Exception("Stand bulunamadı.");
-
-            return new StandDto
-            {
-                Id = stand.Id,
-                Name = stand.Name,
-                Price = stand.Price,
-                Area = stand.Area,
-                Description = stand.Description,
-                ParticipantFullName = stand.Participant?.FullName,
-                FairName = stand.Fair?.Name,
-                PaymentStatus = stand.PaymentStatus.ToString(),
-                AmountPaid =stand.AmountPaid,
-                AmountRemaining = stand.AmountRemaining,
-                DueDate = stand.DueDate ?? DateTime.MinValue
-            };
-        }
-
-        public async Task<List<StandDto>> GetStandsAsync(StandFilterDto filter)
-        {
-            var query = _context.Stands
-                .Include(s => s.Participant)
-                .Include(s => s.Fair)
-                .AsQueryable();
-
-            if (filter.FairId.HasValue)
-                query = query.Where(s => s.FairId == filter.FairId);
-
-            if (filter.ParticipantId.HasValue)
-                query = query.Where(s => s.ParticipantId == filter.ParticipantId);
-
-            if (!string.IsNullOrEmpty(filter.PaymentStatus))
-                query = query.Where(s => s.PaymentStatus == filter.PaymentStatus);
-
-            if (!string.IsNullOrEmpty(filter.Search))
-                query = query.Where(s => s.Name.Contains(filter.Search) ||
-                                         s.Description.Contains(filter.Search));
-
-            // Sıralama
-            query = filter.SortBy?.ToLower() switch
-            {
-                "price" => filter.SortDescending ? query.OrderByDescending(s => s.Price) : query.OrderBy(s => s.Price),
-                "area" => filter.SortDescending ? query.OrderByDescending(s => s.Area) : query.OrderBy(s => s.Area),
-                "duedate" => filter.SortDescending ? query.OrderByDescending(s => s.DueDate) : query.OrderBy(s => s.DueDate),
-                _ => filter.SortDescending ? query.OrderByDescending(s => s.Name) : query.OrderBy(s => s.Name)
-            };
-
-            // Sayfalama
-            var skip = (filter.PageNumber - 1) * filter.PageSize;
-            query = query.Skip(skip).Take(filter.PageSize);
-
-            var stands = await query.ToListAsync();
-
-            return stands.Select(stand => new StandDto
-            {
-                Id = stand.Id,
-                Name = stand.Name,
-                Price = stand.Price,
-                Area = stand.Area,
-                Description = stand.Description,
-                ParticipantFullName = stand.Participant?.FullName,
-                FairName = stand.Fair?.Name,
-                PaymentStatus = stand.PaymentStatus,
-                AmountPaid = stand.AmountPaid,
-                AmountRemaining = stand.AmountRemaining,
-                DueDate = stand.DueDate ?? DateTime.MinValue
-            }).ToList();
-        }
-
-        public async Task<List<Stand>> GetStandsWithUpcomingDueDateAsync(int days)
-        {
-            var targetDate = DateTime.Today.AddDays(days);
-
-            return await _context.Stands
-                .Where(s => s.DueDate.HasValue &&
-                            s.DueDate.Value.Date == targetDate.Date)
-                .Include(s => s.Participant)
-                .Include(s => s.Fair)
-                .ToListAsync();
-        }
-
-        public async Task<List<Stand>> GetUnpaidStandsAsync()
-        {
-            return await _context.Stands
-                .Where(s => s.AmountPaid <= 0 || s.PaymentStatus == "Hiç Ödenmedi")
-                .Include(s => s.Participant)
-                .Include(s => s.Fair)
-                .ToListAsync();
-        }
-
-
     }
 }

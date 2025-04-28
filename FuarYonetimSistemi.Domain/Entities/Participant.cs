@@ -13,8 +13,14 @@ namespace FuarYonetimSistemi.Domain.Entities
         public string Email { get; set; }     // Katılımcının e-posta adresi
         public string Phone { get; set; }     // Katılımcının telefon numarası
 
-        public bool IsDeleted { get; set; }  // Silinmiş kontrolü için
+        // Yeni eklenen firma bilgileri
+        public string CompanyName { get; set; }  // Firma adı
+        public string Address { get; set; }      // Firma adresi
+        public string PhoneNumbers { get; set; } // Firma telefon numaraları
+        public string Website { get; set; }      // Firma web sitesi
+        public string Branches { get; set; }     // Firma şubeleri
 
+        public bool IsDeleted { get; set; }  // Silinmiş kontrolü için
         public DateTime CreateDate { get; set; }
         public string AuthFullName { get; set; }
 

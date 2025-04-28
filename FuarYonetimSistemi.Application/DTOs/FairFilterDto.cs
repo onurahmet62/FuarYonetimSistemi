@@ -19,5 +19,10 @@ namespace FuarYonetimSistemi.Application.DTOs
         public bool SortDescending { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+
+        // Yeni Alanlar
+        public decimal? RevenueTarget { get; set; } // Gelir hedefi için filtreleme
+        public decimal? ExpenseTarget { get; set; } // Gider hedefi için filtreleme
+        public decimal? NetProfitTarget { get; set; } // Net kar hedefi için filtreleme
     }
 }

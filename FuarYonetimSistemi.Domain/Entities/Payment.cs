@@ -11,20 +11,14 @@ namespace FuarYonetimSistemi.Domain.Entities
         public Guid Id { get; set; }
         public DateTime PaymentDate { get; set; }
         public decimal Amount { get; set; }
-        public string PaymentMethod { get; set; }
+        public string PaymentMethod { get; set; } // Havale, Peşin vb.
 
-        // Stand ile ilişki
+        public string PaymentDescription { get; set; } // Açıklama (Örneğin: Peşinat, 2. Taksit vb.)
+
         public Guid StandId { get; set; }
         public Stand Stand { get; set; }
 
-        // Either use this string field
-        public string ReceivedBy { get; set; }
-
-        public Guid ParticipantId { get; set; }
-        public Participant Participant { get; set; }
-
-        // OR use a proper relationship to User (but not both)
-        // public Guid ReceivedByUserId { get; set; }
-        // public User ReceivedByUser { get; set; }
+  
+        public string ReceivedBy { get; set; } // Kim teslim aldı (User yerine basit string)
     }
 }

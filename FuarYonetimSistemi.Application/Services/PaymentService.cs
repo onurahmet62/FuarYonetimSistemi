@@ -18,55 +18,96 @@ namespace FuarYonetimSistemi.Application.Services
             _context = context;
         }
 
-        public async Task<List<Payment>> GetAllAsync() => await _context.Payments.ToListAsync();
-
-        public async Task<Payment> GetByIdAsync(Guid id) => await _context.Payments.FindAsync(id);
-
-        public async Task<List<Payment>> GetByParticipantIdAsync(Guid participantId)
-        {
-            return await _context.Payments.Where(p => p.Id == participantId).ToListAsync();
-        }
-
-        public async Task<List<Payment>> GetByStandIdAsync(Guid standId)
-        {
-            return await _context.Payments.Where(p => p.StandId == standId).ToListAsync();
-        }
-
         public async Task<Payment> AddAsync(Payment payment)
         {
+            // Sadece StandId'yi kullanıyoruz, stand'ı doğrulamak için
             var stand = await _context.Stands.FindAsync(payment.StandId);
-            if (stand == null) throw new Exception("Stand bulunamadı.");
-
-            stand.AmountPaid += payment.Amount;
-            stand.AmountRemaining = stand.Price - stand.AmountPaid;
-
-            if (stand.AmountPaid == 0)
-                stand.PaymentStatus = "Hiç Ödenmedi";
-            else if (stand.AmountPaid < stand.Price)
-                stand.PaymentStatus = "Kısmi Ödendi";
-            else
-                stand.PaymentStatus = "Tamamen Ödendi";
+            if (stand == null)
+            {
+                throw new Exception("Stand bulunamadı.");
+            }
 
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
             return payment;
         }
 
-        public async Task DeleteAsync(Guid id)
+
+
+        public async Task<bool> DeleteAsync(Guid id)
         {
             var payment = await _context.Payments.FindAsync(id);
-            if (payment == null) throw new Exception("Ödeme bulunamadı.");
-
-            var stand = await _context.Stands.FindAsync(payment.StandId);
-            if (stand != null)
+            if (payment == null)
             {
-                stand.AmountPaid -= payment.Amount;
-                stand.AmountRemaining = stand.Price - stand.AmountPaid;
-                stand.PaymentStatus = stand.AmountPaid == 0 ? "Hiç Ödenmedi" : (stand.AmountPaid < stand.Price ? "Kısmi Ödendi" : "Tamamen Ödendi");
+                return false;  // Ödeme bulunamadı
             }
 
             _context.Payments.Remove(payment);
             await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<IEnumerable<Payment>> FilterAsync(string searchTerm)
+        {
+            return await _context.Payments
+                .Include(p => p.Stand)
+              
+                .Where(p => p.PaymentDescription.Contains(searchTerm) || p.PaymentMethod.Contains(searchTerm))
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Payment>> GetAllAsync()
+        {
+            return await _context.Payments
+                .Include(p => p.Stand)  // Stand bilgisi
+                  // Katılımcı bilgisi
+                .ToListAsync();
+        }
+
+        public async Task<Payment> GetByIdAsync(Guid id)
+        {
+            return await _context.Payments
+                .Include(p => p.Stand)
+               
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public async Task<IEnumerable<Payment>> GetByParticipantIdAsync(Guid participantId)
+        {
+            return await _context.Payments
+                .Include(p => p.Stand)
+              
+                
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Payment>> GetByStandIdAsync(Guid standId)
+        {
+            return await _context.Payments
+                .Include(p => p.Stand)
+               
+                .Where(p => p.StandId == standId)
+                .ToListAsync();
+        }
+
+        public async Task<Payment> UpdateAsync(Guid id, Payment updatedPayment)
+        {
+            var payment = await _context.Payments.FindAsync(id);
+            if (payment == null)
+            {
+                return null;  // Ödeme bulunamadı
+            }
+
+            // Verileri güncelle
+            payment.PaymentDate = updatedPayment.PaymentDate;
+            payment.Amount = updatedPayment.Amount;
+            payment.PaymentMethod = updatedPayment.PaymentMethod;
+            payment.PaymentDescription = updatedPayment.PaymentDescription;
+            payment.ReceivedBy = updatedPayment.ReceivedBy;
+
+            // Değişiklikleri kaydet
+            await _context.SaveChangesAsync();
+            return payment;
         }
     }
 }

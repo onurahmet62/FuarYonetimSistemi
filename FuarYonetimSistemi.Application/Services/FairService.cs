@@ -33,8 +33,13 @@ namespace FuarYonetimSistemi.Application.Services
                     StartDate = f.StartDate,
                     EndDate = f.EndDate,
                     Organizer = f.Organizer,
-
-                    CategoryName = f.Category != null ? f.Category.Name : null
+                    CategoryName = f.Category != null ? f.Category.Name : null,
+                    RevenueTarget = f.RevenueTarget,
+                    ExpenseTarget = f.ExpenseTarget,
+                    NetProfitTarget = f.NetProfitTarget,
+                    ActualRevenue = f.ActualRevenue,
+                    ActualExpense = f.ActualExpense,
+                    ActualNetProfit = f.ActualNetProfit
                 })
                 .ToListAsync();
         }
@@ -74,9 +79,26 @@ namespace FuarYonetimSistemi.Application.Services
                 StartDate = fairDto.StartDate,
                 EndDate = fairDto.EndDate,
                 Organizer = fairDto.Organizer,
-
                 CategoryId = fairDto.CategoryId ?? Guid.Empty,
-                IsDeleted = false
+                RevenueTarget = fairDto.RevenueTarget,
+                ExpenseTarget = fairDto.ExpenseTarget,
+                NetProfitTarget = fairDto.NetProfitTarget,
+                ParticipatingCountries=fairDto.ParticipatingCountries,
+                TotalParticipantCount = fairDto.TotalParticipantCount,
+                ForeignParticipantCount = fairDto.ForeignParticipantCount,
+                TotalVisitorCount = fairDto.TotalVisitorCount,
+                ForeignVisitorCount = fairDto.ForeignVisitorCount,
+                TotalStandArea = fairDto.TotalStandArea,
+                Budget = fairDto.Budget,
+                FairType = fairDto.FairType,
+                Website = fairDto.Website,
+                Email = fairDto.Email,
+                // Yeni alanlar
+                IsDeleted = false,
+                ActualRevenue = 0, // Başlangıçta gerçekleşen değerler 0
+                ActualExpense = 0,
+                
+             
             };
 
             _context.Fairs.Add(fair);
@@ -91,10 +113,27 @@ namespace FuarYonetimSistemi.Application.Services
                 StartDate = fair.StartDate,
                 EndDate = fair.EndDate,
                 Organizer = fair.Organizer,
+                CategoryName = (await _context.Categories.FindAsync(fair.CategoryId))?.Name,
+                RevenueTarget = fair.RevenueTarget,
+                ExpenseTarget = fair.ExpenseTarget,
+                NetProfitTarget = fair.NetProfitTarget,
+                ActualRevenue = 0, // Başlangıçta gerçekleşen değerler 0
+                ActualExpense = 0,
+                ActualNetProfit = 0,
+                TotalParticipantCount = fairDto.TotalParticipantCount,
+                ForeignParticipantCount = fairDto.ForeignParticipantCount,
+                TotalVisitorCount = fairDto.TotalVisitorCount,
+                ForeignVisitorCount = fairDto.ForeignVisitorCount,
+                TotalStandArea = fairDto.TotalStandArea,
+                Budget = fairDto.Budget,
+                FairType = fairDto.FairType,
+                Website = fairDto.Website,
+                Email = fairDto.Email,
+                
 
-                CategoryName = (await _context.Categories.FindAsync(fair.CategoryId))?.Name
             };
         }
+
 
         public async Task<bool> DeleteFairAsync(Guid id)
         {

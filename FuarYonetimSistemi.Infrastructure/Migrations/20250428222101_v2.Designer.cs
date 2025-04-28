@@ -4,6 +4,7 @@ using FuarYonetimSistemi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FuarYonetimSistemi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250428222101_v2")]
+    partial class v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,12 +102,16 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ParticipatingCountries")
+                    b.PrimitiveCollection<string>("ParticipatingCountries")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("RevenueTarget")
                         .HasColumnType("decimal(18,2)");
+
+                    b.PrimitiveCollection<string>("Sponsors")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StandCount")
                         .HasColumnType("int");
@@ -200,6 +207,9 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
@@ -219,6 +229,8 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
 
                     b.HasIndex("StandId");
 
@@ -416,11 +428,19 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
 
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Payment", b =>
                 {
+                    b.HasOne("FuarYonetimSistemi.Domain.Entities.Participant", "Participant")
+                        .WithMany()
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("FuarYonetimSistemi.Domain.Entities.Stand", "Stand")
                         .WithMany("Payments")
                         .HasForeignKey("StandId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Participant");
 
                     b.Navigation("Stand");
                 });

@@ -10,31 +10,13 @@ namespace FuarYonetimSistemi.Application.Interfaces
 {
     public interface IStandService
     {
-        // Stand oluşturma
-        Task<StandDto> CreateStandAsync(StandCreateDto standCreateDto);
-
-        // Stand bilgilerini güncelleme
-        Task<StandDto> UpdateStandAsync(StandUpdateDto standUpdateDto);
-
-        // Stand silme
-        Task<bool> DeleteStandAsync(Guid standId);
-
-        // Bir fuara ait tüm standları listeleme
-        Task<List<StandDto>> GetStandsByFairAsync(Guid fairId);
-
-        // Bir katılımcıya ait tüm standları listeleme
-        Task<List<StandDto>> GetStandsByParticipantAsync(Guid participantId);
-
-        // Stand ödeme durumu güncelleme
-        Task<StandDto> UpdatePaymentStatusAsync(StandPaymentStatusDto paymentStatusDto);
-
-        // Stand detaylarını alma
-        Task<StandDto> GetStandByIdAsync(Guid standId);
-
-        Task<List<StandDto>> GetStandsAsync(StandFilterDto filterDto);
-
-        Task<List<Stand>> GetStandsWithUpcomingDueDateAsync(int days);
-        Task<List<Stand>> GetUnpaidStandsAsync();
-
+        Task<IEnumerable<Stand>> GetAllAsync();  // Tüm standları getir
+        Task<Stand> GetByIdAsync(Guid id);  // Id'ye göre stand getir
+        Task<IEnumerable<Stand>> GetByFairIdAsync(Guid fairId);  // Fuar bazında standları getir
+        Task<IEnumerable<Stand>> GetByParticipantIdAsync(Guid participantId);  // Katılımcıya ait standları getir
+        Task<Stand> AddAsync(StandCreateDto standCreateDto);  // Yeni bir stand ekle
+        Task<Stand> UpdateAsync(Guid id, Stand updatedStand);  // Stand güncelle
+        Task<bool> DeleteAsync(Guid id);  // Stand silme
+        Task<IEnumerable<Stand>> FilterAsync(string searchTerm);  // Filtreleme işlemi (İsim veya diğer özellikler)
     }
 }

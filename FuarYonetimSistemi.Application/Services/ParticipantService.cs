@@ -31,6 +31,11 @@ namespace FuarYonetimSistemi.Application.Services
                 Phone = dto.Phone,
                 CreateDate = DateTime.UtcNow,
                 AuthFullName = dto.AuthFullName,
+                CompanyName = dto.CompanyName,  // Add Company Name
+                Address = dto.Address,          // Add Address
+                PhoneNumbers = dto.PhoneNumbers, // Add Phone Numbers
+                Website = dto.Website,          // Add Website
+                Branches = dto.Branches,        // Add Branches
                 IsDeleted = false
             };
 
@@ -44,7 +49,12 @@ namespace FuarYonetimSistemi.Application.Services
                 Email = participant.Email,
                 Phone = participant.Phone,
                 CreateDate = participant.CreateDate,
-                AuthFullName = participant.AuthFullName
+                AuthFullName = participant.AuthFullName,
+                CompanyName = participant.CompanyName, // Return company info in DTO
+                Address = participant.Address,         // Return address in DTO
+                PhoneNumbers = participant.PhoneNumbers, // Return phone numbers in DTO
+                Website = participant.Website,           // Return website in DTO
+                Branches = participant.Branches          // Return branches in DTO
             };
         }
 
@@ -58,8 +68,12 @@ namespace FuarYonetimSistemi.Application.Services
             participant.Email = dto.Email;
             participant.Phone = dto.Phone;
             participant.AuthFullName = dto.AuthFullName;
+            participant.CompanyName = dto.CompanyName;  // Update Company Name
+            participant.Address = dto.Address;          // Update Address
+            participant.PhoneNumbers = dto.PhoneNumbers; // Update Phone Numbers
+            participant.Website = dto.Website;          // Update Website
+            participant.Branches = dto.Branches;        // Update Branches
             participant.CreateDate = DateTime.UtcNow;
-
 
             await _context.SaveChangesAsync();
 
@@ -68,9 +82,14 @@ namespace FuarYonetimSistemi.Application.Services
                 Id = participant.Id,
                 FullName = participant.FullName,
                 Email = participant.Email,
-                Phone = participant.Phone,  
+                Phone = participant.Phone,
                 CreateDate = DateTime.UtcNow,
-                AuthFullName = participant.AuthFullName
+                AuthFullName = participant.AuthFullName,
+                CompanyName = participant.CompanyName, // Return updated company info
+                Address = participant.Address,         // Return updated address
+                PhoneNumbers = participant.PhoneNumbers, // Return updated phone numbers
+                Website = participant.Website,           // Return updated website
+                Branches = participant.Branches          // Return updated branches
             };
         }
 
@@ -99,10 +118,14 @@ namespace FuarYonetimSistemi.Application.Services
                 Id = participant.Id,
                 FullName = participant.FullName,
                 Email = participant.Email,
-                Phone = participant.Phone, 
+                Phone = participant.Phone,
                 CreateDate = DateTime.UtcNow,
-                AuthFullName = participant.AuthFullName
-
+                AuthFullName = participant.AuthFullName,
+                CompanyName = participant.CompanyName, // Return company info
+                Address = participant.Address,         // Return address
+                PhoneNumbers = participant.PhoneNumbers, // Return phone numbers
+                Website = participant.Website,           // Return website
+                Branches = participant.Branches          // Return branches
             };
         }
 
@@ -115,7 +138,14 @@ namespace FuarYonetimSistemi.Application.Services
                     Id = p.Id,
                     FullName = p.FullName,
                     Email = p.Email,
-                    Phone = p.Phone
+                    Phone = p.Phone,
+                    CreateDate = p.CreateDate,
+                    AuthFullName = p.AuthFullName,
+                    CompanyName = p.CompanyName, // Include company info
+                    Address = p.Address,         // Include address
+                    PhoneNumbers = p.PhoneNumbers, // Include phone numbers
+                    Website = p.Website,           // Include website
+                    Branches = p.Branches          // Include branches
                 })
                 .ToListAsync();
         }
@@ -164,7 +194,12 @@ namespace FuarYonetimSistemi.Application.Services
                     Email = p.Email,
                     Phone = p.Phone,
                     CreateDate = p.CreateDate,
-                    AuthFullName = p.AuthFullName
+                    AuthFullName = p.AuthFullName,
+                    CompanyName = p.CompanyName, // Include company info in result
+                    Address = p.Address,         // Include address
+                    PhoneNumbers = p.PhoneNumbers, // Include phone numbers
+                    Website = p.Website,           // Include website
+                    Branches = p.Branches          // Include branches
                 })
                 .ToListAsync();
 
@@ -175,9 +210,6 @@ namespace FuarYonetimSistemi.Application.Services
             };
         }
 
-
-
+      
     }
-
-
 }

@@ -21,16 +21,70 @@ namespace FuarYonetimSistemi.Infrastructure.Data
 
             // Stand precision settings
             modelBuilder.Entity<Stand>()
-                .Property(s => s.Price)
+                .Property(s => s.UnitPrice)
                 .HasPrecision(18, 2);
             modelBuilder.Entity<Stand>()
-                .Property(s => s.AmountPaid)
+                .Property(s => s.SaleAmountWithoutVAT)
                 .HasPrecision(18, 2);
             modelBuilder.Entity<Stand>()
-                .Property(s => s.AmountRemaining)
+                .Property(s => s.ElectricityConnectionFee)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.ThirdPartyInsuranceShare)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.StandSetupIncome)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.SolidWasteFee)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.AdvertisingIncome)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.ContractAmountWithoutVAT)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.VAT10Amount)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.VAT20Amount)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.StampTaxAmount)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.TotalAmountWithVAT)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.TotalReturnInvoice)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.BarterInvoiceAmount)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.CashCollection)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.DocumentCollection)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.Balance)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.ReceivablesInLaw)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.CollectibleBalance)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.BarterAmount)
+                .HasPrecision(18, 2);
+            modelBuilder.Entity<Stand>()
+                .Property(s => s.BarterBalance)
                 .HasPrecision(18, 2);
 
-            // Payment precision
+            // Payment precision settings
             modelBuilder.Entity<Payment>()
                 .Property(p => p.Amount)
                 .HasPrecision(18, 2);
@@ -42,15 +96,30 @@ namespace FuarYonetimSistemi.Infrastructure.Data
                 .HasForeignKey(p => p.StandId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-           
+         
 
-            // Configure Payment -> Participant relationship if needed
-            modelBuilder.Entity<Payment>()
-                .HasOne(p => p.Participant)
+            // Configure Stand -> Participant relationship
+            modelBuilder.Entity<Stand>()
+                .HasOne(s => s.Participant)
+                .WithMany(p => p.Stands)
+                .HasForeignKey(s => s.ParticipantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure Stand -> Fair relationship
+            modelBuilder.Entity<Stand>()
+                .HasOne(s => s.Fair)
+                .WithMany(f => f.Stands)
+                .HasForeignKey(s => s.FairId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure Fair -> Category relationship
+            modelBuilder.Entity<Fair>()
+                .HasOne(f => f.Category)
                 .WithMany()
-                .HasForeignKey(p => p.ParticipantId)
-                .OnDelete(DeleteBehavior.NoAction);
-        }
+                .HasForeignKey(f => f.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            
+        }
     }
 }
