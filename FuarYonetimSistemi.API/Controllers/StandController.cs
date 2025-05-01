@@ -78,12 +78,20 @@ namespace FuarYonetimSistemi.WebApi.Controllers
             return NoContent();
         }
 
-        // GET api/stands/search?term={term}
-        [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<Stand>>> Search([FromQuery] string term)
+        [HttpPost("filter")]
+        public async Task<IActionResult> GetFilteredStands([FromBody] StandFilterRequestDto request)
         {
-            var stands = await _standService.FilterAsync(term);
+            var result = await _standService.GetSortedAsync(request);
+            return Ok(result);
+        }
+
+
+        [HttpGet("due-in/{days}")]
+        public async Task<ActionResult<IEnumerable<Stand>>> GetStandsDueInDays(int days)
+        {
+            var stands = await _standService.GetStandsDueInDaysAsync(days);
             return Ok(stands);
         }
+
     }
 }

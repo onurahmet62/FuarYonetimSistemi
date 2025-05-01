@@ -162,11 +162,12 @@ namespace FuarYonetimSistemi.Application.Services
             if (!string.IsNullOrWhiteSpace(filter.Email))
                 query = query.Where(p => p.Email.Contains(filter.Email));
 
-            if (!string.IsNullOrWhiteSpace(filter.Phone))
-                query = query.Where(p => p.Phone.Contains(filter.Phone));
-
+          
             if (!string.IsNullOrWhiteSpace(filter.AuthFullName))
                 query = query.Where(p => p.AuthFullName.Contains(filter.AuthFullName));
+
+            if (!string.IsNullOrWhiteSpace(filter.CompanyName))
+                query = query.Where(p => p.CompanyName.Contains(filter.CompanyName));
 
             if (filter.CreateDate.HasValue)
                 query = query.Where(p => p.CreateDate.Date == filter.CreateDate.Value.Date);
@@ -176,8 +177,9 @@ namespace FuarYonetimSistemi.Application.Services
             {
                 "fullname" => filter.IsDescending ? query.OrderByDescending(p => p.FullName) : query.OrderBy(p => p.FullName),
                 "email" => filter.IsDescending ? query.OrderByDescending(p => p.Email) : query.OrderBy(p => p.Email),
-                "phone" => filter.IsDescending ? query.OrderByDescending(p => p.Phone) : query.OrderBy(p => p.Phone),
+           
                 "authfullname" => filter.IsDescending ? query.OrderByDescending(p => p.AuthFullName) : query.OrderBy(p => p.AuthFullName),
+                "companyname" => filter.IsDescending ? query.OrderByDescending(p => p.CompanyName) : query.OrderBy(p => p.CompanyName),
                 "createdate" => filter.IsDescending ? query.OrderByDescending(p => p.CreateDate) : query.OrderBy(p => p.CreateDate),
                 _ => filter.IsDescending ? query.OrderByDescending(p => p.CreateDate) : query.OrderBy(p => p.CreateDate)
             };
@@ -192,14 +194,14 @@ namespace FuarYonetimSistemi.Application.Services
                     Id = p.Id,
                     FullName = p.FullName,
                     Email = p.Email,
-                    Phone = p.Phone,
+                  
                     CreateDate = p.CreateDate,
                     AuthFullName = p.AuthFullName,
-                    CompanyName = p.CompanyName, // Include company info in result
-                    Address = p.Address,         // Include address
-                    PhoneNumbers = p.PhoneNumbers, // Include phone numbers
-                    Website = p.Website,           // Include website
-                    Branches = p.Branches          // Include branches
+                    CompanyName = p.CompanyName,
+                    Address = p.Address,
+                    PhoneNumbers = p.PhoneNumbers,
+                    Website = p.Website,
+                    Branches = p.Branches
                 })
                 .ToListAsync();
 
@@ -210,6 +212,7 @@ namespace FuarYonetimSistemi.Application.Services
             };
         }
 
-      
+
+
     }
 }

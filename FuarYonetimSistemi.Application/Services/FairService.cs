@@ -156,21 +156,22 @@ namespace FuarYonetimSistemi.Application.Services
             if (!string.IsNullOrEmpty(filterDto.Name))
                 query = query.Where(f => f.Name.Contains(filterDto.Name));
 
+            if (!string.IsNullOrEmpty(filterDto.Organizer))
+                query = query.Where(f => f.Organizer.Contains(filterDto.Organizer));
+
             if (!string.IsNullOrEmpty(filterDto.Location))
                 query = query.Where(f => f.Location.Contains(filterDto.Location));
-
-            if (filterDto.CategoryId.HasValue)
-                query = query.Where(f => f.CategoryId == filterDto.CategoryId);
 
             if (filterDto.Year.HasValue)
                 query = query.Where(f => f.Year == filterDto.Year);
 
-            if (filterDto.StartDateFrom.HasValue)
-                query = query.Where(f => f.StartDate >= filterDto.StartDateFrom.Value);
+            if (!string.IsNullOrEmpty(filterDto.FairType))
+                query = query.Where(f => f.FairType == filterDto.FairType);
 
-            if (filterDto.StartDateTo.HasValue)
-                query = query.Where(f => f.StartDate <= filterDto.StartDateTo.Value);
+            if (filterDto.CategoryId.HasValue)
+                query = query.Where(f => f.CategoryId == filterDto.CategoryId);
 
+            // Sıralama
             if (!string.IsNullOrWhiteSpace(filterDto.SortBy))
             {
                 switch (filterDto.SortBy.ToLower())
@@ -181,8 +182,14 @@ namespace FuarYonetimSistemi.Application.Services
                     case "year":
                         query = filterDto.SortDescending ? query.OrderByDescending(f => f.Year) : query.OrderBy(f => f.Year);
                         break;
+                    case "location":
+                        query = filterDto.SortDescending ? query.OrderByDescending(f => f.Location) : query.OrderBy(f => f.Location);
+                        break;
+                    case "organizer":
+                        query = filterDto.SortDescending ? query.OrderByDescending(f => f.Organizer) : query.OrderBy(f => f.Organizer);
+                        break;
                     default:
-                        query = query.OrderBy(f => f.Name);
+                        query = query.OrderBy(f => f.Name); // varsayılan sıralama
                         break;
                 }
             }
@@ -201,12 +208,13 @@ namespace FuarYonetimSistemi.Application.Services
                     StartDate = f.StartDate,
                     EndDate = f.EndDate,
                     Organizer = f.Organizer,
-                    CategoryName = f.Category.Name
+                    CategoryName = f.Category != null ? f.Category.Name : null
                 })
                 .ToListAsync();
 
             return (fairs, totalCount);
         }
+
 
         public async Task<byte[]> ExportFairsToExcelAsync(FairFilterDto filterDto)
         {

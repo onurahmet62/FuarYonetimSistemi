@@ -177,5 +177,71 @@ namespace FuarYonetimSistemi.Application.Services
             await _context.SaveChangesAsync();
             return stand;
         }
+
+        public async Task<IEnumerable<Stand>> GetSortedAsync(StandFilterRequestDto filter)
+        {
+            IQueryable<Stand> query = _context.Stands
+                .Include(s => s.Participant)
+                .Include(s => s.Fair);
+
+            // Filtreleme
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+                query = query.Where(s => s.Name.Contains(filter.Name));
+
+            if (!string.IsNullOrWhiteSpace(filter.FairHall))
+                query = query.Where(s => s.FairHall.Contains(filter.FairHall));
+
+            if (filter.ContractDate.HasValue)
+                query = query.Where(s => s.ContractDate.Date == filter.ContractDate.Value.Date);
+
+            if (filter.ActualDueDate.HasValue)
+                query = query.Where(s => s.ActualDueDate.HasValue && s.ActualDueDate.Value.Date == filter.ActualDueDate.Value.Date);
+
+            if (filter.ParticipantId.HasValue)
+                query = query.Where(s => s.ParticipantId == filter.ParticipantId.Value);
+
+            if (filter.FairId.HasValue)
+                query = query.Where(s => s.FairId == filter.FairId.Value);
+
+            if (!string.IsNullOrWhiteSpace(filter.SalesRepresentative))
+                query = query.Where(s => s.SalesRepresentative.Contains(filter.SalesRepresentative));
+
+            // Sıralama
+            if (!string.IsNullOrEmpty(filter.SortBy))
+            {
+                query = filter.SortBy.ToLower() switch
+                {
+                    "name" => filter.IsDescending ? query.OrderByDescending(s => s.Name) : query.OrderBy(s => s.Name),
+                    "fairhall" => filter.IsDescending ? query.OrderByDescending(s => s.FairHall) : query.OrderBy(s => s.FairHall),
+                    "contractdate" => filter.IsDescending ? query.OrderByDescending(s => s.ContractDate) : query.OrderBy(s => s.ContractDate),
+                    "actualduedate" => filter.IsDescending ? query.OrderByDescending(s => s.ActualDueDate) : query.OrderBy(s => s.ActualDueDate),
+                    "participantid" => filter.IsDescending ? query.OrderByDescending(s => s.ParticipantId) : query.OrderBy(s => s.ParticipantId),
+                    "fairid" => filter.IsDescending ? query.OrderByDescending(s => s.FairId) : query.OrderBy(s => s.FairId),
+                    "salesrepresentative" => filter.IsDescending ? query.OrderByDescending(s => s.SalesRepresentative) : query.OrderBy(s => s.SalesRepresentative),
+                    _ => query
+                };
+            }
+
+            // Sayfalama
+            return await query
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
+        }
+
+
+
+        public async Task<IEnumerable<Stand>> GetStandsDueInDaysAsync(int days)
+        {
+            var targetDate = DateTime.Today.AddDays(days);
+
+            return await _context.Stands
+                .Include(s => s.Participant)
+                .Include(s => s.Fair)
+                .Where(s => s.ActualDueDate.HasValue && s.ActualDueDate.Value.Date <= targetDate)
+                .ToListAsync();
+        }
+
+
     }
 }

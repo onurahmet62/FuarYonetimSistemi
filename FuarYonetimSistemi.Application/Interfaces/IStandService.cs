@@ -17,6 +17,9 @@ namespace FuarYonetimSistemi.Application.Interfaces
         Task<Stand> AddAsync(StandCreateDto standCreateDto);  // Yeni bir stand ekle
         Task<Stand> UpdateAsync(Guid id, Stand updatedStand);  // Stand güncelle
         Task<bool> DeleteAsync(Guid id);  // Stand silme
-        Task<IEnumerable<Stand>> FilterAsync(string searchTerm);  // Filtreleme işlemi (İsim veya diğer özellikler)
+      
+
+        Task<IEnumerable<Stand>> GetSortedAsync(StandFilterRequestDto filter);
+        Task<IEnumerable<Stand>> GetStandsDueInDaysAsync(int days);
     }
 }
