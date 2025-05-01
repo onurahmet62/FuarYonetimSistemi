@@ -57,6 +57,7 @@ builder.Services.AddScoped<IFairService, FairService>();
 builder.Services.AddScoped<IStandService, StandService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

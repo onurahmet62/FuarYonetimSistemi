@@ -45,8 +45,6 @@ namespace FuarYonetimSistemi.Domain.Entities
         public decimal ActualNetProfit { get; set; } // Gerçekleşen net kar
 
 
-
-
     }
 
 }

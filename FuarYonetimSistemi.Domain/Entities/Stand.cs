@@ -42,6 +42,7 @@ public class Stand
 
     public string SalesRepresentative { get; set; } // Satış Temsilcisi
     public string Note { get; set; } // Not
+    public bool IsDeleted { get; set; }
 
     // Foreign key ve Navigation
     public Guid ParticipantId { get; set; }
