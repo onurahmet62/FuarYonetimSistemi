@@ -84,11 +84,14 @@ namespace FuarYonetimSistemi.Application.Services
                 return false;  // Stand bulunamadı
             }
 
-            // Soft delete (silmek yerine, aktif olarak işaretlenebilir)
-            _context.Stands.Remove(stand);
+            // Soft delete: Sadece IsDeleted alanını true yapıyoruz
+            stand.IsDeleted = true;
+            _context.Stands.Update(stand);
             await _context.SaveChangesAsync();
+
             return true;
         }
+
 
         public async Task<IEnumerable<Stand>> FilterAsync(string searchTerm)
         {

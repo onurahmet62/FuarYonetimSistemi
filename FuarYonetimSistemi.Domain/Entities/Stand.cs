@@ -1,58 +1,119 @@
 ﻿using FuarYonetimSistemi.Domain.Enums;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace FuarYonetimSistemi.Domain.Entities;
-
-public class Stand
+namespace FuarYonetimSistemi.Domain.Entities
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } // Stand Adı
-    public string FairHall { get; set; }
-    public double AreaSold { get; set; } // Gerçekleşen Satış m2
-    public double AreaExchange { get; set; } // Gerçekleşen Satış Takas m2
-    public double ContractArea { get; set; } // Gerçekleşen Sözleşme m2
-    public decimal UnitPrice { get; set; } // Birim Fiyatı
+    public class Stand
+    {
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-    public decimal SaleAmountWithoutVAT { get; set; } // Gerçekleşen Satış (KDV'siz)
-    public decimal ElectricityConnectionFee { get; set; } // Elektrik Bağlantı Bedeli
-    public decimal ThirdPartyInsuranceShare { get; set; } // 3. Şahıs Sigorta Payı
-    public decimal StandSetupIncome { get; set; } // Stand Kurma Geliri (KDV'siz)
-    public decimal SolidWasteFee { get; set; } // Katı Atık Bedeli (KDV'siz)
-    public decimal AdvertisingIncome { get; set; } // Reklam, Sponsor, Katolog Geliri (KDV'siz)
+        [Required, MaxLength(100)]
+        public string Name { get; set; } = string.Empty;
 
-    public decimal ContractAmountWithoutVAT { get; set; } // Sözleşme Tutarı (KDV'siz)
-    public decimal VAT10Amount { get; set; } // KDV %10
-    public decimal VAT20Amount { get; set; } // KDV %20
-    public decimal StampTaxAmount { get; set; } // Damga Vergisi (KDV'siz)
+        [Required, MaxLength(50)]
+        public string FairHall { get; set; } = string.Empty;
 
-    public decimal TotalAmountWithVAT { get; set; } // Toplam KDV'li Tutar
-    public decimal TotalReturnInvoice { get; set; } // Toplam İade Faturası
-    public decimal BarterInvoiceAmount { get; set; } // Takas Fatura Tutarı
+        [Range(0, double.MaxValue)]
+        public double AreaSold { get; set; }
 
-    public decimal CashCollection { get; set; } // Nakit Tahsilat / Havale
-    public decimal DocumentCollection { get; set; } // Evrak Tahsilatı
-    public decimal Balance { get; set; } // Bakiye
-    public decimal ReceivablesInLaw { get; set; } // Hukuktaki Alacaklar
-    public decimal CollectibleBalance { get; set; } // Tahsil Edilebilir Bakiye
-    public decimal BarterAmount { get; set; } // Takas Takas Tutarı
-    public decimal BarterBalance { get; set; } // Takas Takas Bakiye
+        [Range(0, double.MaxValue)]
+        public double AreaExchange { get; set; }
 
-    public DateTime? ActualDueDate { get; set; } // Gerçekleşen Vade
-    public DateTime ContractDate { get; set; } // Sözleşme Tarihi
+        [Range(0, double.MaxValue)]
+        public double ContractArea { get; set; }
 
-    public string SalesRepresentative { get; set; } // Satış Temsilcisi
-    public string Note { get; set; } // Not
-    public bool IsDeleted { get; set; }
+        [Range(0, double.MaxValue)]
+        public decimal UnitPrice { get; set; }
 
-    // Foreign key ve Navigation
-    public Guid ParticipantId { get; set; }
-    [JsonIgnore]
-    public Participant Participant { get; set; }
+        [Range(0, double.MaxValue)]
+        public decimal SaleAmountWithoutVAT { get; set; }
 
-    public Guid FairId { get; set; }
-    [JsonIgnore]
-    public Fair Fair { get; set; }
+        [Range(0, double.MaxValue)]
+        public decimal ElectricityConnectionFee { get; set; }
 
-    // Bu standın ödeme kayıtları
-    public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+        [Range(0, double.MaxValue)]
+        public decimal ThirdPartyInsuranceShare { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal StandSetupIncome { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal SolidWasteFee { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal AdvertisingIncome { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal ContractAmountWithoutVAT { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal VAT10Amount { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal VAT20Amount { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal StampTaxAmount { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal TotalAmountWithVAT { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal TotalReturnInvoice { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal BarterInvoiceAmount { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal CashCollection { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal DocumentCollection { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal Balance { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal ReceivablesInLaw { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal CollectibleBalance { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal BarterAmount { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal BarterBalance { get; set; }
+
+        public DateTime? ActualDueDate { get; set; }
+
+        public DateTime ContractDate { get; set; } = DateTime.UtcNow;
+
+        [MaxLength(100)]
+        public string SalesRepresentative { get; set; } = string.Empty;
+
+        [MaxLength(1000)]
+        public string Note { get; set; } = string.Empty;
+
+        public bool IsDeleted { get; set; } = false;
+
+        // Foreign Keys
+        [Required]
+        public Guid ParticipantId { get; set; }
+
+        [JsonIgnore]
+        public Participant Participant { get; set; }
+
+        [Required]
+        public Guid FairId { get; set; }
+
+        [JsonIgnore]
+        public Fair Fair { get; set; }
+
+        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    }
 }

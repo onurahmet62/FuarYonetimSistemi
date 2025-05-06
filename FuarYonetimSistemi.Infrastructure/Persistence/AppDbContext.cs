@@ -118,8 +118,15 @@ namespace FuarYonetimSistemi.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(f => f.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
 
-            
+
+            // Global query filters (Soft delete)
+            modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
+            modelBuilder.Entity<Participant>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Stand>().HasQueryFilter(s => !s.IsDeleted);
+            modelBuilder.Entity<Payment>().HasQueryFilter(p => !p.IsDeleted);
+
         }
     }
 }

@@ -1,27 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace FuarYonetimSistemi.Domain.Entities
 {
     public class Payment
     {
-        public Guid Id { get; set; }
-        public DateTime PaymentDate { get; set; }
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        [Required]
+        public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
+
+        [Required]
+        [Range(0, double.MaxValue, ErrorMessage = "Tutar negatif olamaz.")]
         public decimal Amount { get; set; }
-        public string PaymentMethod { get; set; } // Havale, Peşin vb.
 
-        public string PaymentDescription { get; set; } // Açıklama (Örneğin: Peşinat, 2. Taksit vb.)
+        [Required]
+        [MaxLength(50)]
+        public string PaymentMethod { get; set; } = string.Empty; // Havale, Peşin vb.
 
+        [MaxLength(500)]
+        public string PaymentDescription { get; set; } = string.Empty; // Peşinat, 2. Taksit vb.
+
+        [Required]
         public Guid StandId { get; set; }
+
         [JsonIgnore]
         public Stand Stand { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
-        public string ReceivedBy { get; set; } // Kim teslim aldı (User yerine basit string)
+        [MaxLength(100)]
+        public string ReceivedBy { get; set; } = string.Empty; // Kim teslim aldı
     }
 }

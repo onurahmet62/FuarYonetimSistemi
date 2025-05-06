@@ -1,50 +1,92 @@
-﻿using FuarYonetimSistemi.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using FuarYonetimSistemi.Domain.Enums;
 
 namespace FuarYonetimSistemi.Domain.Entities
 {
     public class Fair
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Location { get; set; }
-        public string Organizer { get; set; }
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        [Required, MaxLength(200)]
+        public string Name { get; set; } = string.Empty;
+
+        [ MaxLength(300)]
+        public string Location { get; set; } = string.Empty;
+
+        [Required, MaxLength(200)]
+        public string Organizer { get; set; } = string.Empty;
+
+        [Range(1900, 2100)]
         public int Year { get; set; }
+
+        [Required]
         public DateTime StartDate { get; set; }
+
+        [Required]
         public DateTime EndDate { get; set; }
-        public bool IsDeleted { get; set; }  // Silinmiş kontrolü için
-        public int StandCount { get; set; }
-        public Guid CategoryId { get; set; } // Foreign key
-        public Category Category { get; set; } // Navigation property
-        public ICollection<Stand> Stands { get; set; }  // Fuarın tüm standları
 
-        // Yeni Alanlar:
-        public string FairType { get; set; }  // Fuar türü (İhtisas, Genel, vb.)
-        public string Website { get; set; } // Web adresi
-        public string Email { get; set; } // E-posta adresi
-        public int TotalParticipantCount { get; set; } // Katılımcı firma sayısı
-        public int ForeignParticipantCount { get; set; } // Yabancı katılımcı sayısı
-        public int TotalVisitorCount { get; set; } // Toplam ziyaretçi sayısı
-        public int ForeignVisitorCount { get; set; } // Yabancı ziyaretçi sayısı
-        public double TotalStandArea { get; set; } // Kurulan standların toplam alanı
-        public string ParticipatingCountries { get; set; } // Katılan ülkeler
-        public decimal Budget { get; set; } // Fuarın bütçesi
+        public bool IsDeleted { get; set; } = false;
 
+        public int StandCount { get; set; } // İstersen EF'de hesaplanan olarak ayarlayabiliriz
 
-        // Gelir ve Gider ile ilgili yeni alanlar:
-        public decimal RevenueTarget { get; set; } // Gelir hedefi
-        public decimal ExpenseTarget { get; set; } // Gider hedefi
-        public decimal NetProfitTarget { get; set; } // Net kar hedefi
+        
+        public Guid CategoryId { get; set; }
 
-        public decimal ActualRevenue { get; set; } // Gerçekleşen gelir
-        public decimal ActualExpense { get; set; } // Gerçekleşen gider
-        public decimal ActualNetProfit { get; set; } // Gerçekleşen net kar
+        [ForeignKey(nameof(CategoryId))]
+        public Category Category { get; set; } = null!;
 
+        public ICollection<Stand> Stands { get; set; } = new List<Stand>();
 
+        [MaxLength(100)]
+        public string FairType { get; set; } = string.Empty;
+
+        [MaxLength(250), Url]
+        public string Website { get; set; } = string.Empty;
+
+        [MaxLength(150), EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Range(0, int.MaxValue)]
+        public int TotalParticipantCount { get; set; }
+
+        [Range(0, int.MaxValue)]
+        public int ForeignParticipantCount { get; set; }
+
+        [Range(0, int.MaxValue)]
+        public int TotalVisitorCount { get; set; }
+
+        [Range(0, int.MaxValue)]
+        public int ForeignVisitorCount { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public double TotalStandArea { get; set; }
+
+        [MaxLength(500)]
+        public string ParticipatingCountries { get; set; } = string.Empty;
+
+        [Range(0, double.MaxValue)]
+        public decimal Budget { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal RevenueTarget { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal ExpenseTarget { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal NetProfitTarget { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal ActualRevenue { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal ActualExpense { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal ActualNetProfit { get; set; }
     }
-
 }
