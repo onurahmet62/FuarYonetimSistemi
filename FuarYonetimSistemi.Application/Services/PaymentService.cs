@@ -22,12 +22,12 @@ namespace FuarYonetimSistemi.Application.Services
         public async Task<IEnumerable<Payment>> GetAllAsync()
         {
             return await _context.Payments
-                .Where(p => !p.IsDeleted)
                 .Include(p => p.Stand)
+                .Where(p => !p.IsDeleted)
                 .ToListAsync();
         }
 
-        public async Task<Payment> GetByIdAsync(Guid id)
+        public async Task<Payment?> GetByIdAsync(Guid id)
         {
             return await _context.Payments
                 .Include(p => p.Stand)
@@ -51,19 +51,20 @@ namespace FuarYonetimSistemi.Application.Services
                 PaymentDescription = dto.PaymentDescription,
                 ReceivedBy = dto.ReceivedBy,
                 StandId = dto.StandId,
-                Stand = stand,
                 IsDeleted = false
             };
 
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
+
             return payment;
         }
 
-        public async Task<Payment> UpdateAsync(Guid id, Payment updatedPayment)
+        public async Task<Payment?> UpdateAsync(Guid id, Payment updatedPayment)
         {
             var payment = await _context.Payments.FindAsync(id);
-            if (payment == null || payment.IsDeleted) return null;
+            if (payment == null || payment.IsDeleted)
+                return null;
 
             payment.PaymentDate = updatedPayment.PaymentDate;
             payment.Amount = updatedPayment.Amount;
@@ -78,11 +79,87 @@ namespace FuarYonetimSistemi.Application.Services
         public async Task<bool> DeleteAsync(Guid id)
         {
             var payment = await _context.Payments.FindAsync(id);
-            if (payment == null || payment.IsDeleted) return false;
+            if (payment == null || payment.IsDeleted)
+                return false;
 
             payment.IsDeleted = true;
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<IEnumerable<Payment>> GetFilteredAsync(PaymentFilterDto filter)
+        {
+            var query = _context.Payments
+                .Include(p => p.Stand)
+                    .ThenInclude(s => s.Participant)
+                .Where(p => !p.IsDeleted)
+                .AsQueryable();
+
+            if (filter.StartDate.HasValue)
+                query = query.Where(p => p.PaymentDate >= filter.StartDate.Value);
+
+            if (filter.EndDate.HasValue)
+                query = query.Where(p => p.PaymentDate <= filter.EndDate.Value);
+
+            if (!string.IsNullOrWhiteSpace(filter.PaymentMethod))
+                query = query.Where(p => p.PaymentMethod == filter.PaymentMethod);
+
+            if (!string.IsNullOrWhiteSpace(filter.ReceivedBy))
+                query = query.Where(p => p.ReceivedBy.Contains(filter.ReceivedBy));
+
+            if (filter.ParticipantId.HasValue)
+                query = query.Where(p => p.Stand.ParticipantId == filter.ParticipantId.Value);
+
+            // Sıralama
+            query = filter.SortBy switch
+            {
+                "Amount" => filter.SortDescending ? query.OrderByDescending(p => p.Amount) : query.OrderBy(p => p.Amount),
+                "ReceivedBy" => filter.SortDescending ? query.OrderByDescending(p => p.ReceivedBy) : query.OrderBy(p => p.ReceivedBy),
+                _ => filter.SortDescending ? query.OrderByDescending(p => p.PaymentDate) : query.OrderBy(p => p.PaymentDate),
+            };
+
+            // Sayfalama
+            query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<PaymentWithStandAndFairDto?> GetWithStandAndFairAsync(Guid id)
+        {
+            var payment = await _context.Payments
+                .Include(p => p.Stand)
+                    .ThenInclude(s => s.Fair)
+                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+
+            if (payment == null) return null;
+
+            return new PaymentWithStandAndFairDto
+            {
+                Id = payment.Id,
+                PaymentDate = payment.PaymentDate,
+                Amount = payment.Amount,
+                PaymentMethod = payment.PaymentMethod,
+                PaymentDescription = payment.PaymentDescription,
+                StandId = payment.StandId,
+                IsDeleted = payment.IsDeleted,
+                ReceivedBy = payment.ReceivedBy,
+                Stand = new StandDto
+                {
+                    Id = payment.Stand.Id,
+                    Name = payment.Stand.Name,
+                    ContractArea = payment.Stand.ContractArea,
+                    UnitPrice = payment.Stand.UnitPrice
+                },
+                Fair = new FairDto
+                {
+                    Id = payment.Stand.Fair.Id,
+                    Name = payment.Stand.Fair.Name,
+                    StartDate = payment.Stand.Fair.StartDate,
+                    EndDate = payment.Stand.Fair.EndDate
+                }
+            };
+        }
+
+    
     }
 }
