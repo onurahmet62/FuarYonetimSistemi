@@ -7,11 +7,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization; // JSON ayarları için eklendi
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x =>
+{
+    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 // Swagger configuration for JWT support
@@ -58,6 +63,8 @@ builder.Services.AddScoped<IStandService, StandService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IOfficeExpenseService, OfficeExpenseService>();
+builder.Services.AddScoped<IFairExpenseService, FairExpenseService>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -83,9 +90,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()     // Her yerden gelen istekler kabul edilir
-              .AllowAnyHeader()    // Herhangi bir header'la gelen istekler kabul edilir
-              .AllowAnyMethod();   // Herhangi bir HTTP method'uyla gelen istekler kabul edilir
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -99,10 +106,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication(); // Authentication middleware
-app.UseAuthorization();  // Authorization middleware
-
-app.UseCors("AllowAll"); // Enable CORS policy
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseCors("AllowAll");
 
 app.MapControllers();
 

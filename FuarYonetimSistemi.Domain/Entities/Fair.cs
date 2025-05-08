@@ -88,5 +88,7 @@ namespace FuarYonetimSistemi.Domain.Entities
 
         [Range(0, double.MaxValue)]
         public decimal ActualNetProfit { get; set; }
+
+        public ICollection<FairExpense> FairExpenses { get; set; } = new List<FairExpense>();
     }
 }

@@ -15,6 +15,11 @@ namespace FuarYonetimSistemi.Infrastructure.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Category> Categories { get; set; }
 
+        public DbSet<OfficeExpenseType> OfficeExpenseTypes { get; set; }
+        public DbSet<OfficeExpense> OfficeExpenses { get; set; }
+
+        public DbSet<FairExpense> FairExpenses { get; set; }
+        public DbSet<FairExpenseType> FairExpenseTypes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -126,6 +131,39 @@ namespace FuarYonetimSistemi.Infrastructure.Data
             modelBuilder.Entity<Participant>().HasQueryFilter(p => !p.IsDeleted);
             modelBuilder.Entity<Stand>().HasQueryFilter(s => !s.IsDeleted);
             modelBuilder.Entity<Payment>().HasQueryFilter(p => !p.IsDeleted);
+
+            // Configure OfficeExpense relationship
+            modelBuilder.Entity<OfficeExpense>()
+                .HasOne(o => o.ExpenseType)
+                .WithMany() // Eğer bir ExpenseType birden fazla OfficeExpense’e sahip oluyorsa
+                .HasForeignKey(o => o.OfficeExpenseTypeId)
+                .OnDelete(DeleteBehavior.Restrict); // Silme işlemi yapıldığında ne olacağına karar verin.
+
+            modelBuilder.Entity<FairExpense>()
+               .HasOne(f => f.Fair)
+               .WithMany(f => f.FairExpenses)
+               .HasForeignKey(f => f.FairId);
+
+            modelBuilder.Entity<FairExpense>()
+                .HasOne(f => f.ExpenseType)
+                .WithMany()
+                .HasForeignKey(f => f.FairExpenseTypeId);
+
+            modelBuilder.Entity<FairExpense>()
+                .Property(f => f.AccountCode)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Fair>()
+               .HasMany(f => f.FairExpenses)
+               .WithOne(fe => fe.Fair)
+               .HasForeignKey(fe => fe.FairId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FairExpense>()
+                .HasOne(fe => fe.ExpenseType)
+                .WithMany()
+                .HasForeignKey(fe => fe.FairExpenseTypeId)
+                .OnDelete(DeleteBehavior.Restrict); // Gider tipi silinirse gider tablosunu etkileme
 
         }
     }

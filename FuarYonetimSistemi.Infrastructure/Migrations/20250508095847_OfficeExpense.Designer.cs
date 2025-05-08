@@ -4,6 +4,7 @@ using FuarYonetimSistemi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FuarYonetimSistemi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250508095847_OfficeExpense")]
+    partial class OfficeExpense
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,73 +146,6 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                     b.HasIndex("CategoryId1");
 
                     b.ToTable("Fairs");
-                });
-
-            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.FairExpense", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AccountCode")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("AnnualActual")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("AnnualTarget")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CurrentActual")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CurrentTarget")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid>("FairExpenseTypeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("FairExpenseTypeId1")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("FairId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("RealizedExpense")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FairExpenseTypeId");
-
-                    b.HasIndex("FairExpenseTypeId1");
-
-                    b.HasIndex("FairId");
-
-                    b.ToTable("FairExpenses");
-                });
-
-            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.FairExpenseType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FairExpenseTypes");
                 });
 
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.OfficeExpense", b =>
@@ -567,29 +503,6 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.FairExpense", b =>
-                {
-                    b.HasOne("FuarYonetimSistemi.Domain.Entities.FairExpenseType", "ExpenseType")
-                        .WithMany()
-                        .HasForeignKey("FairExpenseTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("FuarYonetimSistemi.Domain.Entities.FairExpenseType", null)
-                        .WithMany("FairExpenses")
-                        .HasForeignKey("FairExpenseTypeId1");
-
-                    b.HasOne("FuarYonetimSistemi.Domain.Entities.Fair", "Fair")
-                        .WithMany("FairExpenses")
-                        .HasForeignKey("FairId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ExpenseType");
-
-                    b.Navigation("Fair");
-                });
-
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.OfficeExpense", b =>
                 {
                     b.HasOne("FuarYonetimSistemi.Domain.Entities.OfficeExpenseType", "ExpenseType")
@@ -638,14 +551,7 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
 
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Fair", b =>
                 {
-                    b.Navigation("FairExpenses");
-
                     b.Navigation("Stands");
-                });
-
-            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.FairExpenseType", b =>
-                {
-                    b.Navigation("FairExpenses");
                 });
 
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Participant", b =>
