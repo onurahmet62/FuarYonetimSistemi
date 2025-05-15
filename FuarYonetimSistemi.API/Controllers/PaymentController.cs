@@ -1,6 +1,7 @@
 ﻿using FuarYonetimSistemi.Application.DTOs;
 using FuarYonetimSistemi.Application.Interfaces;
 using FuarYonetimSistemi.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace FuarYonetimSistemi.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,Manager,SalesPerson")]
     public class PaymentsController : ControllerBase
     {
         private readonly IPaymentService _paymentService;

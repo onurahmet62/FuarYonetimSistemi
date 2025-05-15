@@ -15,6 +15,10 @@ namespace FuarYonetimSistemi.Application.Interfaces
         Task<List<FairExpenseType>> GetExpenseTypesAsync();
         Task<FairExpenseType> CreateExpenseTypeAsync(FairExpenseTypeCreateDto dto);
         Task<FairExpenseType> DeleteExpenseTypeAsync(Guid id);
+        Task<(List<FairExpense> Expenses, int TotalCount)> GetFairExpensesFilteredAsync(FairExpenseFilterDto filterDto);
+
+        Task<(List<FairExpenseType> ExpenseTypes, int TotalCount)> GetExpenseTypesFilteredAsync(FairExpenseTypeFilterDto filterDto);
+
     }
 }
     

@@ -3,11 +3,13 @@ using FuarYonetimSistemi.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FuarYonetimSistemi.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,Manager,SalesPerson")]
     public class FairExpensesController : ControllerBase
     {
         private readonly IFairExpenseService _fairExpenseService;
@@ -98,5 +100,39 @@ namespace FuarYonetimSistemi.API.Controllers
                 return NotFound(ex.Message);
             }
         }
+
+        [HttpPost("filter")]
+        public async Task<IActionResult> GetFilteredFairExpenses([FromBody] FairExpenseFilterDto filterDto)
+        {
+            var (expenses, totalCount) = await _fairExpenseService.GetFairExpensesFilteredAsync(filterDto);
+
+            var result = new
+            {
+                Data = expenses,
+                TotalCount = totalCount,
+                PageNumber = filterDto.PageNumber,
+                PageSize = filterDto.PageSize
+            };
+
+            return Ok(result);
+        }
+
+
+        [HttpPost("expense-types/filter")]
+        public async Task<IActionResult> GetFilteredExpenseTypes([FromBody] FairExpenseTypeFilterDto filterDto)
+        {
+            var (expenseTypes, totalCount) = await _fairExpenseService.GetExpenseTypesFilteredAsync(filterDto);
+
+            var result = new
+            {
+                Data = expenseTypes,
+                TotalCount = totalCount,
+                PageNumber = filterDto.PageNumber,
+                PageSize = filterDto.PageSize
+            };
+
+            return Ok(result);
+        }
+
     }
 }

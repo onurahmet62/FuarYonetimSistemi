@@ -9,6 +9,7 @@ namespace FuarYonetimSistemi.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,Manager,SalesPerson")]
     public class FairController : ControllerBase
     {
         private readonly IFairService _fairService;

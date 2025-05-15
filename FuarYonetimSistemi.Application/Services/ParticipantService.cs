@@ -199,7 +199,7 @@ namespace FuarYonetimSistemi.Application.Services
                     AuthFullName = p.AuthFullName,
                     CompanyName = p.CompanyName,
                     Address = p.Address,
-                    PhoneNumbers = p.PhoneNumbers,
+                    Phone = p.Phone,
                     Website = p.Website,
                     Branches = p.Branches
                 })
@@ -211,7 +211,6 @@ namespace FuarYonetimSistemi.Application.Services
                 TotalCount = totalCount
             };
         }
-
 
 
     }

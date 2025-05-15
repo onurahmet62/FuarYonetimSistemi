@@ -165,6 +165,10 @@ namespace FuarYonetimSistemi.Infrastructure.Data
                 .HasForeignKey(fe => fe.FairExpenseTypeId)
                 .OnDelete(DeleteBehavior.Restrict); // Gider tipi silinirse gider tablosunu etkileme
 
+            modelBuilder.Entity<Fair>()
+                .Property(p => p.ActualExpense)
+                .HasPrecision(18, 2);
+
         }
     }
 }

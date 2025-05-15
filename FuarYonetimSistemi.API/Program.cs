@@ -3,11 +3,12 @@ using FuarYonetimSistemi.Application.Services;
 using FuarYonetimSistemi.Infrastructure.Data;
 using FuarYonetimSistemi.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using System.Text.Json.Serialization; // JSON ayarları için eklendi
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add Dependency Injection services
+// Dependency injection
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -65,8 +66,9 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IOfficeExpenseService, OfficeExpenseService>();
 builder.Services.AddScoped<IFairExpenseService, FairExpenseService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
-// Add JWT Authentication
+// JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -85,7 +87,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// Allow all origins (CORS) for now (only for development/staging)
+// CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -98,7 +100,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// HTTP pipeline configuration
+
+// URL rewrite: "/" isteği => "/AZB/index.html"
+app.UseRewriter(new RewriteOptions()
+    .AddRewrite("^$", "index.html", skipRemainingRules: true));
+
+// Static files
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
