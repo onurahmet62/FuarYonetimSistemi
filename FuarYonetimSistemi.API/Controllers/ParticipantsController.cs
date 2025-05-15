@@ -1,4 +1,5 @@
-﻿using FuarYonetimSistemi.Application.DTOs;
+﻿using ClosedXML.Excel;
+using FuarYonetimSistemi.Application.DTOs;
 using FuarYonetimSistemi.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -67,6 +68,38 @@ namespace FuarYonetimSistemi.API.Controllers
         {
             var result = await _participantService.FilterPagedAsync(filter);
             return Ok(result);
+        }
+
+        [HttpGet("export-excel")]
+        public async Task<IActionResult> ExportParticipantsToExcel()
+        {
+            var participants = await _participantService.GetAllAsync();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Participants");
+
+            worksheet.Cell(1, 1).Value = "Ad Soyad";
+            worksheet.Cell(1, 2).Value = "Firma";
+            worksheet.Cell(1, 3).Value = "Telefon";
+            worksheet.Cell(1, 4).Value = "Email";
+
+            int row = 2;
+            foreach (var p in participants)
+            {
+                worksheet.Cell(row, 1).Value = p.FullName;
+                worksheet.Cell(row, 2).Value = p.CompanyName;
+                worksheet.Cell(row, 3).Value = p.Phone;
+                worksheet.Cell(row, 4).Value = p.Email;
+                row++;
+            }
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            stream.Position = 0;
+
+            return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "Participants.xlsx");
         }
     }
 

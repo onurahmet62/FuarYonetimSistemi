@@ -4,6 +4,7 @@ using FuarYonetimSistemi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FuarYonetimSistemi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250515195825_deletePhoneNumber")]
+    partial class deletePhoneNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,49 +47,52 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal?>("ActualExpense")
+                    b.Property<decimal>("ActualExpense")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal?>("ActualNetProfit")
+                    b.Property<decimal>("ActualNetProfit")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal?>("ActualRevenue")
+                    b.Property<decimal>("ActualRevenue")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal?>("Budget")
+                    b.Property<decimal>("Budget")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid?>("CategoryId")
+                    b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CategoryId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("ExpenseTarget")
+                    b.Property<decimal>("ExpenseTarget")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("FairType")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("ForeignParticipantCount")
+                    b.Property<int>("ForeignParticipantCount")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ForeignVisitorCount")
+                    b.Property<int>("ForeignVisitorCount")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Location")
+                        .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
@@ -95,40 +101,43 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<decimal?>("NetProfitTarget")
+                    b.Property<decimal>("NetProfitTarget")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Organizer")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("ParticipatingCountries")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<decimal?>("RevenueTarget")
+                    b.Property<decimal>("RevenueTarget")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("StandCount")
+                    b.Property<int>("StandCount")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("TotalParticipantCount")
+                    b.Property<int>("TotalParticipantCount")
                         .HasColumnType("int");
 
-                    b.Property<double?>("TotalStandArea")
+                    b.Property<double>("TotalStandArea")
                         .HasColumnType("float");
 
-                    b.Property<int?>("TotalVisitorCount")
+                    b.Property<int>("TotalVisitorCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Website")
+                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int?>("Year")
+                    b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -547,7 +556,8 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                     b.HasOne("FuarYonetimSistemi.Domain.Entities.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("FuarYonetimSistemi.Domain.Entities.Category", null)
                         .WithMany("Fairs")

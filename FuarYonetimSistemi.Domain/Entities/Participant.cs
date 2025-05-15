@@ -26,8 +26,7 @@ namespace FuarYonetimSistemi.Domain.Entities
         [MaxLength(300)]
         public string Address { get; set; } = string.Empty;
 
-        [MaxLength(100)]
-        public string PhoneNumbers { get; set; } = string.Empty;
+ 
 
         [MaxLength(250), Url]
         public string Website { get; set; } = string.Empty;

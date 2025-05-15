@@ -50,13 +50,9 @@ namespace FuarYonetimSistemi.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Kategori kontrolü
-            if (fairDto.CategoryId == null && string.IsNullOrWhiteSpace(fairDto.NewCategoryName))
-            {
-                return BadRequest("Kategori seçilmeli veya yeni bir kategori adı girilmelidir.");
-            }
+            // Kategori kontrolü KALDIRILDI — artık kategori zorunlu değil.
 
-            // Yeni kategori oluşturulacaksa
+            // Yeni kategori oluşturulacaksa (opsiyonel)
             if (!string.IsNullOrWhiteSpace(fairDto.NewCategoryName))
             {
                 var existingCategory = await _categoryService.GetCategoryByNameAsync(fairDto.NewCategoryName);
@@ -75,17 +71,6 @@ namespace FuarYonetimSistemi.API.Controllers
             return CreatedAtAction(nameof(GetFairById), new { id = createdFair.Id }, createdFair);
         }
 
-        // DELETE: api/Fair/{id}
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> DeleteFair(Guid id)
-        {
-            var result = await _fairService.DeleteFairAsync(id);
-            if (!result)
-                return NotFound();
-
-            return NoContent();
-        }
 
 
         // POST: api/Fair/filter

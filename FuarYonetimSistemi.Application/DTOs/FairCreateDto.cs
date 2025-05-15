@@ -8,36 +8,38 @@ namespace FuarYonetimSistemi.Application.DTOs
 {
     public class FairCreateDto
     {
-        public string Name { get; set; }
-        public string Location { get; set; }
-        public int Year { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public string Organizer { get; set; }
-        public Guid? CategoryId { get; set; } // Mevcut kategori seçimi için
-        public string NewCategoryName { get; set; } // Yeni kategori eklemek için
+        public string Name { get; set; } = null!;  // Zorunlu
+
+        public string? Location { get; set; }
+        public int? Year { get; set; }
+
+        public DateTime StartDate { get; set; }  // Zorunlu
+        public DateTime EndDate { get; set; }  // Zorunlu
+
+        public string? Organizer { get; set; }
+        public Guid? CategoryId { get; set; }
+        public string? NewCategoryName { get; set; }
 
         // Yeni Alanlar:
-        public string FairType { get; set; }  // Fuar türü (İhtisas, Genel, vb.)
-        public string Website { get; set; } // Web adresi
-        public string Email { get; set; } // E-posta adresi
-        public int TotalParticipantCount { get; set; } // Katılımcı firma sayısı
-        public int ForeignParticipantCount { get; set; } // Yabancı katılımcı sayısı
-        public int TotalVisitorCount { get; set; } // Toplam ziyaretçi sayısı
-        public int ForeignVisitorCount { get; set; } // Yabancı ziyaretçi sayısı
-        public double TotalStandArea { get; set; } // Kurulan standların toplam alanı
-        public string ParticipatingCountries { get; set; } // Katılan ülkeler
-        public decimal Budget { get; set; } // Fuarın bütçesi
-
+        public string? FairType { get; set; }
+        public string? Website { get; set; }
+        public string? Email { get; set; }
+        public int? TotalParticipantCount { get; set; }
+        public int? ForeignParticipantCount { get; set; }
+        public int? TotalVisitorCount { get; set; }
+        public int? ForeignVisitorCount { get; set; }
+        public double? TotalStandArea { get; set; }
+        public string? ParticipatingCountries { get; set; }
+        public decimal? Budget { get; set; }
 
         // Gelir ve Gider ile ilgili yeni alanlar:
-        public decimal RevenueTarget { get; set; } // Gelir hedefi
-        public decimal ExpenseTarget { get; set; } // Gider hedefi
-        public decimal NetProfitTarget { get; set; } // Net kar hedefi
+        public decimal? RevenueTarget { get; set; }
+        public decimal? ExpenseTarget { get; set; }
+        public decimal? NetProfitTarget { get; set; }
 
-        public decimal ActualRevenue { get; set; } // Gerçekleşen gelir
-        public decimal ActualExpense { get; set; } // Gerçekleşen gider
-        public decimal ActualNetProfit { get; set; } // Gerçekleşen net kar
+        public decimal? ActualRevenue { get; set; }
+        public decimal? ActualExpense { get; set; }
+        public decimal? ActualNetProfit { get; set; }
     }
 
 }

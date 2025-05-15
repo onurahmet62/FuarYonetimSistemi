@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using FuarYonetimSistemi.Domain.Enums;
 
 namespace FuarYonetimSistemi.Domain.Entities
 {
@@ -12,83 +11,82 @@ namespace FuarYonetimSistemi.Domain.Entities
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required, MaxLength(200)]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = null!;  // Zorunlu, boş bırakılamaz
 
-        [ MaxLength(300)]
-        public string Location { get; set; } = string.Empty;
+        [MaxLength(300)]
+        public string? Location { get; set; }  // Opsiyonel, nullable
 
-        [Required, MaxLength(200)]
-        public string Organizer { get; set; } = string.Empty;
+        [MaxLength(200)]
+        public string? Organizer { get; set; }  // Opsiyonel, nullable
 
         [Range(1900, 2100)]
-        public int Year { get; set; }
+        public int? Year { get; set; }  // Opsiyonel, nullable
 
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; set; }  // Zorunlu
 
         [Required]
-        public DateTime EndDate { get; set; }
+        public DateTime EndDate { get; set; }  // Zorunlu
 
         public bool IsDeleted { get; set; } = false;
 
-        public int StandCount { get; set; } // İstersen EF'de hesaplanan olarak ayarlayabiliriz
+        public int? StandCount { get; set; }  // Opsiyonel, nullable
 
-        
-        public Guid CategoryId { get; set; }
+        public Guid? CategoryId { get; set; }  // Opsiyonel, nullable
 
         [ForeignKey(nameof(CategoryId))]
-        public Category Category { get; set; } = null!;
+        public Category? Category { get; set; }  // Opsiyonel, nullable
 
-        public ICollection<Stand> Stands { get; set; } = new List<Stand>();
+        public ICollection<Stand>? Stands { get; set; }  // Opsiyonel, nullable
 
         [MaxLength(100)]
-        public string FairType { get; set; } = string.Empty;
+        public string? FairType { get; set; }  // Opsiyonel, nullable
 
         [MaxLength(250), Url]
-        public string Website { get; set; } = string.Empty;
+        public string? Website { get; set; }  // Opsiyonel, nullable
 
         [MaxLength(150), EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; }  // Opsiyonel, nullable
 
         [Range(0, int.MaxValue)]
-        public int TotalParticipantCount { get; set; }
+        public int? TotalParticipantCount { get; set; }  // Opsiyonel, nullable
 
         [Range(0, int.MaxValue)]
-        public int ForeignParticipantCount { get; set; }
+        public int? ForeignParticipantCount { get; set; }  // Opsiyonel, nullable
 
         [Range(0, int.MaxValue)]
-        public int TotalVisitorCount { get; set; }
+        public int? TotalVisitorCount { get; set; }  // Opsiyonel, nullable
 
         [Range(0, int.MaxValue)]
-        public int ForeignVisitorCount { get; set; }
+        public int? ForeignVisitorCount { get; set; }  // Opsiyonel, nullable
 
         [Range(0, double.MaxValue)]
-        public double TotalStandArea { get; set; }
+        public double? TotalStandArea { get; set; }  // Opsiyonel, nullable
 
         [MaxLength(500)]
-        public string ParticipatingCountries { get; set; } = string.Empty;
+        public string? ParticipatingCountries { get; set; }  // Opsiyonel, nullable
 
         [Range(0, double.MaxValue)]
-        public decimal Budget { get; set; }
+        public decimal? Budget { get; set; }  // Opsiyonel, nullable
 
         [Range(0, double.MaxValue)]
-        public decimal RevenueTarget { get; set; }
+        public decimal? RevenueTarget { get; set; }  // Opsiyonel, nullable
 
         [Range(0, double.MaxValue)]
-        public decimal ExpenseTarget { get; set; }
+        public decimal? ExpenseTarget { get; set; }  // Opsiyonel, nullable
 
         [Range(0, double.MaxValue)]
-        public decimal NetProfitTarget { get; set; }
+        public decimal? NetProfitTarget { get; set; }  // Opsiyonel, nullable
 
         [Range(0, double.MaxValue)]
-        public decimal ActualRevenue { get; set; }
+        public decimal? ActualRevenue { get; set; }  // Opsiyonel, nullable
 
         [Range(0, double.MaxValue)]
-        public decimal ActualExpense { get; set; }
+        public decimal? ActualExpense { get; set; }  // Opsiyonel, nullable
 
         [Range(0, double.MaxValue)]
-        public decimal ActualNetProfit { get; set; }
+        public decimal? ActualNetProfit { get; set; }  // Opsiyonel, nullable
 
-        public ICollection<FairExpense> FairExpenses { get; set; } = new List<FairExpense>();
+        public ICollection<FairExpense>? FairExpenses { get; set; }  // Opsiyonel, nullable
     }
 }
