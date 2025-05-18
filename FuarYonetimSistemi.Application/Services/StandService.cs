@@ -1,13 +1,11 @@
 ﻿using FuarYonetimSistemi.Application.DTOs;
 using FuarYonetimSistemi.Application.Interfaces;
 using FuarYonetimSistemi.Domain.Entities;
-using FuarYonetimSistemi.Domain.Enums;  // PaymentStatus enum kullanımı için gerekli
 using FuarYonetimSistemi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FuarYonetimSistemi.Application.Services
@@ -23,14 +21,11 @@ namespace FuarYonetimSistemi.Application.Services
 
         public async Task<Stand> AddAsync(StandCreateDto standCreateDto)
         {
-            // Katılımcı ve fuar bilgilerini mevcut ID'lerden alalım
             var participant = await _context.Participants.FindAsync(standCreateDto.ParticipantId);
             var fair = await _context.Fairs.FindAsync(standCreateDto.FairId);
 
             if (participant == null || fair == null)
-            {
-                return null;  // Katılımcı veya fuar bulunamadı
-            }
+                return null;
 
             var stand = new Stand
             {
@@ -62,36 +57,28 @@ namespace FuarYonetimSistemi.Application.Services
                 BarterBalance = standCreateDto.BarterBalance,
                 ActualDueDate = standCreateDto.ActualDueDate,
                 ContractDate = standCreateDto.ContractDate,
-                SalesRepresentative = standCreateDto.SalesRepresentative,
-                Note = standCreateDto.Note,
-                ParticipantId = standCreateDto.ParticipantId,  // Katılımcı ID'sini ekliyoruz
-                FairId = standCreateDto.FairId  // Fuar ID'sini ekliyoruz
+                SalesRepresentative = standCreateDto.SalesRepresentative ?? string.Empty,
+                Note = standCreateDto.Note ?? string.Empty, // Fix for CS8601: Assign a default value if null
+                ParticipantId = standCreateDto.ParticipantId,
+                FairId = standCreateDto.FairId
             };
 
             _context.Stands.Add(stand);
             await _context.SaveChangesAsync();
-
             return stand;
         }
-
-
 
         public async Task<bool> DeleteAsync(Guid id)
         {
             var stand = await _context.Stands.FindAsync(id);
             if (stand == null)
-            {
-                return false;  // Stand bulunamadı
-            }
+                return false;
 
-            // Soft delete: Sadece IsDeleted alanını true yapıyoruz
             stand.IsDeleted = true;
             _context.Stands.Update(stand);
             await _context.SaveChangesAsync();
-
             return true;
         }
-
 
         public async Task<IEnumerable<Stand>> FilterAsync(string searchTerm)
         {
@@ -105,8 +92,8 @@ namespace FuarYonetimSistemi.Application.Services
         public async Task<IEnumerable<Stand>> GetAllAsync()
         {
             return await _context.Stands
-                .Include(s => s.Participant)  // Katılımcı bilgisi
-                .Include(s => s.Fair)  // Fuar bilgisi
+                .Include(s => s.Participant)
+                .Include(s => s.Fair)
                 .ToListAsync();
         }
 
@@ -140,11 +127,8 @@ namespace FuarYonetimSistemi.Application.Services
         {
             var stand = await _context.Stands.FindAsync(id);
             if (stand == null)
-            {
-                return null;  // Stand bulunamadı
-            }
+                return null;
 
-            // Verileri güncelle
             stand.Name = updatedStand.Name;
             stand.FairHall = updatedStand.FairHall;
             stand.AreaSold = updatedStand.AreaSold;
@@ -176,7 +160,6 @@ namespace FuarYonetimSistemi.Application.Services
             stand.SalesRepresentative = updatedStand.SalesRepresentative;
             stand.Note = updatedStand.Note;
 
-            // Değişiklikleri kaydet
             await _context.SaveChangesAsync();
             return stand;
         }
@@ -187,7 +170,6 @@ namespace FuarYonetimSistemi.Application.Services
                 .Include(s => s.Participant)
                 .Include(s => s.Fair);
 
-            // Filtreleme
             if (!string.IsNullOrWhiteSpace(filter.Name))
                 query = query.Where(s => s.Name.Contains(filter.Name));
 
@@ -195,7 +177,12 @@ namespace FuarYonetimSistemi.Application.Services
                 query = query.Where(s => s.FairHall.Contains(filter.FairHall));
 
             if (filter.ContractDate.HasValue)
-                query = query.Where(s => s.ContractDate.Date == filter.ContractDate.Value.Date);
+                if (filter.ContractDate.HasValue)
+                    query = query.Where(s => s.ContractDate.HasValue && s.ContractDate.Value.Date == filter.ContractDate.Value.Date);
+
+            if (filter.ActualDueDate.HasValue)
+                query = query.Where(s => s.ActualDueDate.HasValue && s.ActualDueDate.Value.Date == filter.ActualDueDate.Value.Date);
+              
 
             if (filter.ActualDueDate.HasValue)
                 query = query.Where(s => s.ActualDueDate.HasValue && s.ActualDueDate.Value.Date == filter.ActualDueDate.Value.Date);
@@ -209,7 +196,6 @@ namespace FuarYonetimSistemi.Application.Services
             if (!string.IsNullOrWhiteSpace(filter.SalesRepresentative))
                 query = query.Where(s => s.SalesRepresentative.Contains(filter.SalesRepresentative));
 
-            // Sıralama
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
                 query = filter.SortBy.ToLower() switch
@@ -225,14 +211,11 @@ namespace FuarYonetimSistemi.Application.Services
                 };
             }
 
-            // Sayfalama
             return await query
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize)
                 .ToListAsync();
         }
-
-
 
         public async Task<IEnumerable<Stand>> GetStandsDueInDaysAsync(int days)
         {
@@ -244,7 +227,5 @@ namespace FuarYonetimSistemi.Application.Services
                 .Where(s => s.ActualDueDate.HasValue && s.ActualDueDate.Value.Date <= targetDate)
                 .ToListAsync();
         }
-
-
     }
 }

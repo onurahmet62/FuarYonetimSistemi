@@ -17,81 +17,57 @@ namespace FuarYonetimSistemi.Domain.Entities
         [Required, MaxLength(50)]
         public string FairHall { get; set; } = string.Empty;
 
-        [Range(0, double.MaxValue)]
-        public double AreaSold { get; set; }
+        public double? AreaSold { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public double AreaExchange { get; set; }
+        public double? AreaExchange { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public double ContractArea { get; set; }
+        public double? ContractArea { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal UnitPrice { get; set; }
+        public decimal? UnitPrice { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal SaleAmountWithoutVAT { get; set; }
+        public decimal? SaleAmountWithoutVAT { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal ElectricityConnectionFee { get; set; }
+        public decimal? ElectricityConnectionFee { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal ThirdPartyInsuranceShare { get; set; }
+        public decimal? ThirdPartyInsuranceShare { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal StandSetupIncome { get; set; }
+        public decimal? StandSetupIncome { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal SolidWasteFee { get; set; }
+        public decimal? SolidWasteFee { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal AdvertisingIncome { get; set; }
+        public decimal? AdvertisingIncome { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal ContractAmountWithoutVAT { get; set; }
+        public decimal? ContractAmountWithoutVAT { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal VAT10Amount { get; set; }
+        public decimal? VAT10Amount { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal VAT20Amount { get; set; }
+        public decimal? VAT20Amount { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal StampTaxAmount { get; set; }
+        public decimal? StampTaxAmount { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal TotalAmountWithVAT { get; set; }
+        public decimal? TotalAmountWithVAT { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal TotalReturnInvoice { get; set; }
+        public decimal? TotalReturnInvoice { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal BarterInvoiceAmount { get; set; }
+        public decimal? BarterInvoiceAmount { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal CashCollection { get; set; }
+        public decimal? CashCollection { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal DocumentCollection { get; set; }
+        public decimal? DocumentCollection { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal Balance { get; set; }
+        public decimal? Balance { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal ReceivablesInLaw { get; set; }
+        public decimal? ReceivablesInLaw { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal CollectibleBalance { get; set; }
+        public decimal? CollectibleBalance { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal BarterAmount { get; set; }
+        public decimal? BarterAmount { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal BarterBalance { get; set; }
+        public decimal? BarterBalance { get; set; }
 
         public DateTime? ActualDueDate { get; set; }
 
-        public DateTime ContractDate { get; set; } = DateTime.UtcNow;
+        public DateTime? ContractDate { get; set; }
 
         [MaxLength(100)]
         public string SalesRepresentative { get; set; } = string.Empty;

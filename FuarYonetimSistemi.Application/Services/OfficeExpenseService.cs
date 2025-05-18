@@ -49,7 +49,7 @@ namespace FuarYonetimSistemi.Application.Services
 
             var exists = await _context.OfficeExpenseTypes
 
-                .AnyAsync(x => x.Id == dto.OfficeExpenseTypeId && x.IsDeleted);
+                .AnyAsync(x => x.Id == dto.OfficeExpenseTypeId && !x.IsDeleted);
 
             if (!exists)
                 throw new KeyNotFoundException("Gider tipi bulunamadı.");

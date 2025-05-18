@@ -43,8 +43,8 @@ namespace FuarYonetimSistemi.Application.DTOs
         public DateTime? ActualDueDate { get; set; }
         public DateTime ContractDate { get; set; }
 
-        public string SalesRepresentative { get; set; }
-        public string Note { get; set; }
+        public string? SalesRepresentative { get; set; }
+        public string? Note { get; set; }
 
         public Guid ParticipantId { get; set; }
         public Guid FairId { get; set; }

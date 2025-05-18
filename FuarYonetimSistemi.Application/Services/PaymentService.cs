@@ -147,8 +147,8 @@ namespace FuarYonetimSistemi.Application.Services
                 {
                     Id = payment.Stand.Id,
                     Name = payment.Stand.Name,
-                    ContractArea = payment.Stand.ContractArea,
-                    UnitPrice = payment.Stand.UnitPrice
+                    ContractArea = (double)payment.Stand.ContractArea,
+                    UnitPrice = (decimal)payment.Stand.UnitPrice
                 },
                 Fair = new FairDto
                 {
