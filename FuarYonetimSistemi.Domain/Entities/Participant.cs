@@ -34,6 +34,20 @@ namespace FuarYonetimSistemi.Domain.Entities
         [MaxLength(300)]
         public string Branches { get; set; } = string.Empty;
 
+        // Logo Bilgileri
+        [MaxLength(500)]
+        public string? LogoFileName { get; set; } = string.Empty; // Dosya adı
+
+        [MaxLength(500)]
+        public string? LogoFilePath { get; set; } = string.Empty; // Dosya yolu
+
+        [MaxLength(100)]
+        public string? LogoContentType { get; set; } = string.Empty; // MIME type
+
+        public long LogoFileSize { get; set; } = 0; // Dosya boyutu (bytes)
+
+        public DateTime? LogoUploadDate { get; set; } // Logo yüklenme tarihi
+
         public bool IsDeleted { get; set; } = false;
 
         public DateTime CreateDate { get; set; } = DateTime.UtcNow;

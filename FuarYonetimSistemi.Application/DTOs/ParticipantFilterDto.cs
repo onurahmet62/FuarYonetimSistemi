@@ -18,6 +18,7 @@ namespace FuarYonetimSistemi.Application.DTOs
        
 
         public DateTime? CreateDate { get; set; } // Tam eşleşme yapar
+        public bool? HasLogo { get; set; }
 
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;

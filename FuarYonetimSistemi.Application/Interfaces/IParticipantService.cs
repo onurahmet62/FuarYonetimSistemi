@@ -17,6 +17,9 @@ namespace FuarYonetimSistemi.Application.Interfaces
         Task<IEnumerable<ParticipantDto>> GetAllAsync();
      
         Task<PagedResult<ParticipantDto>> FilterPagedAsync(ParticipantFilterDto filter);
+
+        // Logo işlemleri
+        Task<byte[]> GetLogoAsync(Guid participantId);
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,12 @@ namespace FuarYonetimSistemi.Application.DTOs
 
         public DateTime CreateDate { get; set; }
         public string AuthFullName { get; set; }
+
+        // Logo dosyası (opsiyonel - null ise mevcut logo korunur)
+        public IFormFile? LogoFile { get; set; }
+
+        // Logo silme kontrolü
+        public bool RemoveLogo { get; set; } = false;
     }
 
 }
