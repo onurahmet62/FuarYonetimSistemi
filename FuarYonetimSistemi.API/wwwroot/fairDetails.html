@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Ardesk - Fuar Detayları</title>
+
+    <!-- Proje Stilleri -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="css/theme.css" rel="stylesheet">
+</head>
+<body id="page-top">
+    <div id="loadingOverlay" style="display: flex;">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor...</span></div>
+    </div>
+    <div id="wrapper">
+        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar"></ul>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <nav id="topbar-placeholder" class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow"></nav>
+                <div class="container-fluid">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Fuar: <span class="text-primary" id="fairNameTitle">Yükleniyor...</span></h1>
+                        <a href="listfuar.html" class="btn btn-sm btn-outline-primary shadow-sm"><i class="bi bi-arrow-left me-1"></i>Listeye Dön</a>
+                    </div>
+
+                    <!-- GÜNCELLENMİŞ İSTATİSTİK KARTLARI (Yatay Kaydırılabilir) -->
+                    <div class="row flex-nowrap overflow-auto pb-3 mb-4">
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-8">
+                            <div class="card border-start-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center"><div class="col"><div class="text-xs font-weight-bold text-info text-uppercase mb-1">Toplam Katılımcı</div><div id="totalParticipants" class="h5 mb-0 font-weight-bold text-gray-800">0</div></div><div class="col-auto"><i class="bi bi-people-fill fs-2 text-gray-300"></i></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-8">
+                            <div class="card border-start-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center"><div class="col"><div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Toplam Stand</div><div id="totalStands" class="h5 mb-0 font-weight-bold text-gray-800">0</div></div><div class="col-auto"><i class="bi bi-grid-3x3-gap-fill fs-2 text-gray-300"></i></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-8">
+                            <div class="card border-start-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center"><div class="col"><div class="text-xs font-weight-bold text-success text-uppercase mb-1">Gerçekleşen Gelir</div><div id="actualRevenue" class="h5 mb-0 font-weight-bold text-gray-800">₺0</div></div><div class="col-auto"><i class="bi bi-cash-coin fs-2 text-gray-300"></i></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-8">
+                            <div class="card border-start-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center"><div class="col"><div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Gerçekleşen Gider</div><div id="actualExpense" class="h5 mb-0 font-weight-bold text-gray-800">₺0</div></div><div class="col-auto"><i class="bi bi-receipt-cutoff fs-2 text-gray-300"></i></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-8">
+                            <div class="card border-start-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center"><div class="col"><div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Net Kar</div><div id="netProfit" class="h5 mb-0 font-weight-bold text-gray-800">₺0</div></div><div class="col-auto"><i class="bi bi-graph-up-arrow fs-2 text-gray-300"></i></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-8">
+                            <div class="card border-start-secondary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col">
+                                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Doluluk Oranı</div>
+                                            <div class="row g-0 align-items-center">
+                                                <div class="col-auto"><div id="occupancyRate" class="h5 mb-0 me-2 font-weight-bold text-gray-800">0%</div></div>
+                                                <div class="col"><div class="progress" style="height: 0.75rem;"><div id="occupancyProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto"><i class="bi bi-pie-chart-fill fs-2 text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ANA İÇERİK -->
+                    <div class="row">
+                        <div class="col-lg-8 mb-4">
+                            <div class="card shadow">
+                                <div class="card-header p-0">
+                                    <ul class="nav nav-pills" id="fairDetailsTab" role="tablist">
+                                        <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#participants-pane" type="button">Katılımcılar</button></li>
+                                        <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#stands-pane" type="button">Standlar</button></li>
+                                        <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#expenses-pane" type="button">Giderler</button></li>
+                                        <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#payments-pane" type="button">Ödemeler</button></li>
+                                    </ul>
+                                </div>
+                                <div class="card-body">
+                                    <div class="tab-content" id="fairDetailsTabContent">
+                                        <div class="tab-pane fade show active" id="participants-pane" role="tabpanel"><div class="table-responsive"><table class="table table-sm table-bordered table-hover" id="dataTableParticipants" width="100%"></table></div></div>
+                                        <div class="tab-pane fade" id="stands-pane" role="tabpanel"><div class="table-responsive"><table class="table table-sm table-bordered table-hover" id="dataTableStands" width="100%"></table></div></div>
+                                        <div class="tab-pane fade" id="expenses-pane" role="tabpanel"><div class="table-responsive"><table class="table table-sm table-bordered table-hover" id="dataTableExpenses" width="100%"></table></div></div>
+                                        <div class="tab-pane fade" id="payments-pane" role="tabpanel"><div class="table-responsive"><table class="table table-sm table-bordered table-hover" id="dataTablePayments" width="100%"></table></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 mb-4">
+                            <div class="card shadow">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center"><h6 class="m-0 font-weight-bold text-primary">Fuar Künyesi</h6><button class="btn btn-sm btn-outline-primary" id="editFairBtn" data-bs-toggle="modal" data-bs-target="#editFairModal"><i class="bi bi-pencil"></i></button></div>
+                                <div class="card-body">
+                                    <p><strong><i class="bi bi-building text-gray-400 me-2"></i>Organizatör:</strong> <span id="infoOrganizer">-</span></p>
+                                    <p><strong><i class="bi bi-tag-fill text-gray-400 me-2"></i>Kategori:</strong> <span id="infoCategory">-</span></p>
+                                    <p><strong><i class="bi bi-calendar-range text-gray-400 me-2"></i>Tarihler:</strong> <span id="infoDates">-</span></p>
+                                    <p><strong><i class="bi bi-globe text-gray-400 me-2"></i>Website:</strong> <a href="#" target="_blank" id="infoWebsite">-</a></p>
+                                    <hr>
+                                    <h6 class="font-weight-bold text-primary">Hedefler</h6>
+                                    <p class="mb-1"><small>Gelir: <span id="infoRevenueTarget" class="text-muted"></span></small></p>
+                                    <p class="mb-1"><small>Gider: <span id="infoExpenseTarget" class="text-muted"></span></small></p>
+                                    <p><small>Net Kar: <span id="infoNetProfitTarget" class="text-muted"></span></small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white shadow-sm py-3 mt-auto"><div class="container-fluid"><div class="text-center small text-muted">Copyright &copy; ArDesk 2025</div></div></footer>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="editFairModal" tabindex="-1" aria-labelledby="editFairModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editFairModalLabel">Fuar Bilgilerini Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editFairForm">
+                        <input type="hidden" id="editFairId">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editFairName" class="form-label">Fuar Adı</label>
+                                <input type="text" class="form-control" id="editFairName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editFairOrganizer" class="form-label">Organizatör</label>
+                                <input type="text" class="form-control" id="editFairOrganizer">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editFairCategory" class="form-label">Kategori</label>
+                                <input type="text" class="form-control" id="editFairCategory">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editFairWebsite" class="form-label">Website</label>
+                                <input type="url" class="form-control" id="editFairWebsite">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editFairStartDate" class="form-label">Başlangıç Tarihi</label>
+                                <input type="date" class="form-control" id="editFairStartDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editFairEndDate" class="form-label">Bitiş Tarihi</label>
+                                <input type="date" class="form-control" id="editFairEndDate" required>
+                            </div>
+                        </div>
+                        <hr>
+                        <h6 class="text-primary">Hedef Bilgileri</h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="editFairRevenueTarget" class="form-label">Gelir Hedefi (₺)</label>
+                                <input type="number" step="0.01" class="form-control" id="editFairRevenueTarget">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="editFairExpenseTarget" class="form-label">Gider Hedefi (₺)</label>
+                                <input type="number" step="0.01" class="form-control" id="editFairExpenseTarget">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="editFairNetProfitTarget" class="form-label">Net Kar Hedefi (₺)</label>
+                                <input type="number" step="0.01" class="form-control" id="editFairNetProfitTarget" readonly>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" form="editFairForm" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="logoutModal" tabindex="-1"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Çıkış Yapmaya Hazır mısınız?</h5><button class="btn-close" type="button" data-bs-dismiss="modal"></button></div><div class="modal-body">Mevcut oturumunuzu sonlandırmak için "Çıkış Yap"ı seçin.</div><div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">İptal</button><a class="btn btn-primary" id="confirmLogoutBtn" href="#">Çıkış Yap</a></div></div></div></div>
+
+    <!-- Scriptler -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="js/core.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/pages/fairDetails.js"></script>
+</body>
+</html>

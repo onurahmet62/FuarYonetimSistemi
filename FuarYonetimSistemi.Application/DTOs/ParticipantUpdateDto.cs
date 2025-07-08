@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,18 +9,25 @@ namespace FuarYonetimSistemi.Application.DTOs
 {
     public class ParticipantUpdateDto
     {
-        public Guid Id { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
+        public class UpdateParticipantDto
+        {
+            public string FullName { get; set; }
+            public string Email { get; set; }
+            public string Phone { get; set; }
+            public string AuthFullName { get; set; }
+            public string CompanyName { get; set; }
+            public string Address { get; set; }
+            public string Website { get; set; }
+            public IFormFile LogoFile { get; set; }
+            public bool RemoveLogo { get; set; }
 
-        // Yeni eklenen firma bilgileri
-        public string CompanyName { get; set; }  // Firma adı
-        public string Address { get; set; }      // Firma adresi
-       
-        public string Website { get; set; }      // Firma web sitesi
-        public string Branches { get; set; }     // Firma şubeleri
+            // Mutlaka koleksiyon tipleri şöyle olmalı:
+            public ICollection<BranchDto> Branches { get; set; } = new List<BranchDto>();
+            public ICollection<BrandDto> Brands { get; set; } = new List<BrandDto>();
+            public ICollection<ProductCategoryDto> ProductCategories { get; set; } = new List<ProductCategoryDto>();
+            public ICollection<ExhibitedProductDto> ExhibitedProducts { get; set; } = new List<ExhibitedProductDto>();
+            public ICollection<RepresentativeCompanyDto> RepresentativeCompanies { get; set; } = new List<RepresentativeCompanyDto>();
+        }
 
-        public string AuthFullName { get; set; }
     }
 }

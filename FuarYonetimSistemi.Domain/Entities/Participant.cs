@@ -16,46 +16,45 @@ namespace FuarYonetimSistemi.Domain.Entities
         [Required, MaxLength(150), EmailAddress]
         public string Email { get; set; } = string.Empty;
 
-        [Required, MaxLength(20), Phone]
+        [Required, MaxLength(50)]
         public string Phone { get; set; } = string.Empty;
 
-        // Firma Bilgileri
         [Required, MaxLength(200)]
         public string CompanyName { get; set; } = string.Empty;
 
         [MaxLength(300)]
         public string Address { get; set; } = string.Empty;
 
- 
-
-        [MaxLength(250), Url]
+        [MaxLength(250)]
         public string Website { get; set; } = string.Empty;
 
-        [MaxLength(300)]
-        public string Branches { get; set; } = string.Empty;
-
-        // Logo Bilgileri
-        [MaxLength(500)]
-        public string? LogoFileName { get; set; } = string.Empty; // Dosya adı
+        [MaxLength(150)]
+        public string AuthFullName { get; set; } = string.Empty;
 
         [MaxLength(500)]
-        public string? LogoFilePath { get; set; } = string.Empty; // Dosya yolu
+        public string? LogoFileName { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string? LogoFilePath { get; set; } = string.Empty;
 
         [MaxLength(100)]
-        public string? LogoContentType { get; set; } = string.Empty; // MIME type
+        public string? LogoContentType { get; set; } = string.Empty;
 
-        public long LogoFileSize { get; set; } = 0; // Dosya boyutu (bytes)
+        public long LogoFileSize { get; set; } = 0;
 
-        public DateTime? LogoUploadDate { get; set; } // Logo yüklenme tarihi
+        public DateTime? LogoUploadDate { get; set; }
 
         public bool IsDeleted { get; set; } = false;
 
         public DateTime CreateDate { get; set; } = DateTime.UtcNow;
 
-        [MaxLength(150)]
-        public string AuthFullName { get; set; } = string.Empty; // Yetkili kişi adı
-
-        // Navigation Property
+        // 🔗 Navigation Properties
+        public ICollection<Branch> Branches { get; set; } = new List<Branch>();
+        public ICollection<Brand> Brands { get; set; } = new List<Brand>();
+        public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+        public ICollection<RepresentativeCompany> RepresentativeCompanies { get; set; } = new List<RepresentativeCompany>();
+        public ICollection<ExhibitedProduct> ExhibitedProducts { get; set; } = new List<ExhibitedProduct>();
         public ICollection<Stand> Stands { get; set; } = new List<Stand>();
     }
+
 }

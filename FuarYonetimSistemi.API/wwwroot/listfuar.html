@@ -1,0 +1,319 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>ArDesk Fuar Listesi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="css/theme.css" rel="stylesheet">
+</head>
+<body id="page-top">
+    <div id="loadingOverlay" style="display: none;">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor...</span></div>
+    </div>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
+            <!-- JS ile doldurulacak -->
+        </ul>
+        <!-- End of Sidebar -->
+
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <!-- Topbar -->
+                <nav id="topbar-placeholder" class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <!-- JS ile doldurulacak -->
+                </nav>
+                <!-- End of Topbar -->
+                <div class="container-fluid">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Fuar Listesi</h1>
+                        <button class="btn btn-primary btn-sm px-3" id="addFairButton" data-bs-toggle="modal" data-bs-target="#addEditFairModal">
+                            <i class="bi bi-plus-circle me-1"></i> Yeni Fuar Ekle
+                        </button>
+                    </div>
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Filtrele ve Görüntüle</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3 align-items-end">
+                                <div class="col-md-9 d-flex flex-wrap gap-2">
+                                    <form id="filterFormFair" class="row gx-2 gy-2 align-items-end" onsubmit="event.preventDefault(); loadFairs(1);">
+
+                                        <div class="col-auto">
+                                            <label for="filterFairName" class="form-label-sm visually-hidden">Fuar Adı</label>
+                                            <input type="text" class="form-control form-control-sm" id="filterFairName" placeholder="Fuar Adı">
+                                        </div>
+                                        <div class="col-auto">
+                                            <label for="filterFairLocation" class="form-label-sm visually-hidden">Konum</label>
+                                            <input type="text" class="form-control form-control-sm" id="filterFairLocation" placeholder="Konum">
+                                        </div>
+                                        <div class="col-auto">
+                                            <label for="filterFairCategory" class="form-label-sm visually-hidden">Kategori</label>
+                                            <input type="text" class="form-control form-control-sm" id="filterFairCategory" placeholder="Kategori">
+                                        </div>
+                                        <div class="col-auto">
+                                            <label for="filterFairStartDate" class="form-label-sm visually-hidden">Başlangıç Tarihi</label>
+                                            <input type="date" class="form-control form-control-sm" id="filterFairStartDate">
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="submit" class="btn btn-info btn-sm" title="Ara"><i class="bi bi-search"></i> Ara</button>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-secondary btn-sm" id="clearFilterFairBtn" title="Temizle"><i class="bi bi-eraser"></i> Temizle</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-3 d-flex justify-content-end align-items-end">
+                                    <button class="btn btn-success btn-sm me-2" id="exportFairsExcelBtn">
+                                        <i class="bi bi-file-earmark-excel me-1"></i> Excel'e Aktar
+                                    </button>
+                                    <div class="d-flex align-items-center">
+                                        <label for="pageSizeFair" class="form-label-sm me-1 mb-0 text-nowrap">Göster:</label>
+                                        <select id="pageSizeFair" class="form-select form-select-sm" style="width: auto;">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col text-muted small">
+                                    Toplam Kayıt: <span id="totalFairsCount">0</span>
+                                    <span class="ms-3">Gösterilen: <span id="currentFairsRange">0 - 0</span></span>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle mb-0" id="fairTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Fuar Adı</th>
+                                            <th>Konum</th>
+                                            <th>Ülke</th>
+                                            <th>Yıl</th>
+                                            <th>Organizatör</th>
+                                            <th>Başlangıç Tarihi</th>
+                                            <th>Bitiş Tarihi</th>
+                                            <th>Kategori</th>
+                                            <th>Web Sitesi</th>
+                                            <th>Katılımcı Sayısı</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fairListTableBody">
+                                        <!-- Fuar verileri buraya yüklenecek -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center mt-3">
+                                <button class="btn btn-outline-secondary btn-sm me-2" id="fairPreviousPage" disabled><i class="bi bi-chevron-left"></i> Önceki</button>
+                                <span id="currentPageFairDisplay" class="text-muted small">Sayfa: 1 / 1</span>
+                                <button class="btn btn-outline-secondary btn-sm ms-2" id="fairNextPage" disabled>Sonraki <i class="bi bi-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white shadow-sm py-3 mt-auto">
+                <div class="container-fluid">
+                    <div class="text-center small text-muted">
+                        Copyright &copy; ArDesk 2025
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="bi bi-angle-up"></i>
+    </a>
+
+    <!-- Add/Edit Fair Modal (Unified Modal) -->
+    <div class="modal fade" id="addEditFairModal" tabindex="-1" aria-labelledby="addEditFairModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEditFairModalLabel">Yeni Fuar Ekle / Fuar Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="fairForm" onsubmit="event.preventDefault(); /* Handled by JS */">
+                        <input type="hidden" id="fairId"> <!-- For edit operations -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairName" class="form-label">Fuar Adı <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="fairName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairLocation" class="form-label">Konum (Şehir) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="fairLocation" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairCountry" class="form-label">Ülke</label>
+                                <input type="text" class="form-control" id="fairCountry">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairYear" class="form-label">Yıl <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="fairYear" required value="${new Date().getFullYear()}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairStartDate" class="form-label">Başlangıç Tarihi <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="fairStartDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairEndDate" class="form-label">Bitiş Tarihi <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="fairEndDate" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairOrganizer" class="form-label">Organizatör</label>
+                                <input type="text" class="form-control" id="fairOrganizer">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairCategory" class="form-label">Kategori</label>
+                                <select class="form-select" id="fairCategory">
+                                    <option value="">Kategori Seçin</option>
+                                    <option value="Teknoloji">Teknoloji</option>
+                                    <option value="Gıda">Gıda</option>
+                                    <option value="Enerji">Enerji</option>
+                                    <option value="Otomotiv">Otomotiv</option>
+                                    <option value="Sağlık">Sağlık</option>
+                                    <option value="Turizm">Turizm</option>
+                                    <option value="Eğitim">Eğitim</option>
+                                    <option value="Gayrimenkul">Gayrimenkul</option>
+                                    <option value="Moda">Moda</option>
+                                    <option value="Tarım">Tarım</option>
+                                    <option value="Diğer">Diğer</option>
+                                </select>
+                                <small class="form-text text-muted">Eğer listede yoksa, yeni kategori ismi aşağıya yazılabilir.</small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fairNewCategoryName" class="form-label">Yeni Kategori Adı (Opsiyonel)</label>
+                            <input type="text" class="form-control" id="fairNewCategoryName" placeholder="Yeni kategori adı girin">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairType" class="form-label">Fuar Tipi</label>
+                                <input type="text" class="form-control" id="fairType">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairWebsite" class="form-label">Web Sitesi</label>
+                                <input type="url" class="form-control" id="fairWebsite" placeholder="https://ornek.com">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairEmail" class="form-label">E-posta</label>
+                                <input type="email" class="form-control" id="fairEmail" placeholder="ornek@ornek.com">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairTotalParticipantCount" class="form-label">Toplam Katılımcı Sayısı</label>
+                                <input type="number" class="form-control" id="fairTotalParticipantCount" value="0" min="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairForeignParticipantCount" class="form-label">Yabancı Katılımcı Sayısı</label>
+                                <input type="number" class="form-control" id="fairForeignParticipantCount" value="0" min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairTotalVisitorCount" class="form-label">Toplam Ziyaretçi Sayısı</label>
+                                <input type="number" class="form-control" id="fairTotalVisitorCount" value="0" min="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairForeignVisitorCount" class="form-label">Yabancı Ziyaretçi Sayısı</label>
+                                <input type="number" class="form-control" id="fairForeignVisitorCount" value="0" min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairTotalStandArea" class="form-label">Toplam Stand Alanı (m²)</label>
+                                <input type="number" step="0.01" class="form-control" id="fairTotalStandArea" value="0" min="0">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fairParticipatingCountries" class="form-label">Katılımcı Ülkeler (Virgülle Ayırın)</label>
+                            <input type="text" class="form-control" id="fairParticipatingCountries" placeholder="Türkiye, Almanya, ABD">
+                        </div>
+                        <hr>
+                        <h6>Hedefler ve Gerçekleşenler</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairBudget" class="form-label">Bütçe</label>
+                                <input type="number" step="0.01" class="form-control" id="fairBudget" value="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairRevenueTarget" class="form-label">Gelir Hedefi</label>
+                                <input type="number" step="0.01" class="form-control" id="fairRevenueTarget" value="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairExpenseTarget" class="form-label">Gider Hedefi</label>
+                                <input type="number" step="0.01" class="form-control" id="fairExpenseTarget" value="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairNetProfitTarget" class="form-label">Net Kar Hedefi</label>
+                                <input type="number" step="0.01" class="form-control" id="fairNetProfitTarget" value="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fairActualRevenue" class="form-label">Gerçekleşen Gelir</label>
+                                <input type="number" step="0.01" class="form-control" id="fairActualRevenue" value="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fairActualExpense" class="form-label">Gerçekleşen Gider</label>
+                                <input type="number" step="0.01" class="form-control" id="fairActualExpense" value="0">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fairActualNetProfit" class="form-label">Gerçekleşen Net Kar</label>
+                            <input type="number" step="0.01" class="form-control" id="fairActualNetProfit" value="0">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger me-auto d-none" id="deleteFairButtonModal" data-bs-dismiss="modal">Sil</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary" id="saveFairButton">Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Çıkış Yapmaya Hazır mısınız?</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Mevcut oturumunuzu sonlandırmak için "Çıkış Yap"ı seçin.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">İptal</button><a class="btn btn-primary" id="confirmLogoutBtn" href="#">Çıkış Yap</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/pages/listFuar.js"></script>
+</body>
+</html>

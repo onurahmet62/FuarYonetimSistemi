@@ -1,9 +1,14 @@
 ﻿using ClosedXML.Excel;
 using FuarYonetimSistemi.Application.DTOs;
 using FuarYonetimSistemi.Application.Interfaces;
+using FuarYonetimSistemi.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FuarYonetimSistemi.API.Controllers
@@ -24,20 +29,7 @@ namespace FuarYonetimSistemi.API.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
-        {
-            var participants = await _participantService.GetAllAsync();
-            return Ok(participants);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
-        {
-            var participant = await _participantService.GetByIdAsync(id);
-            if (participant == null)
-                return NotFound();
-
-            return Ok(participant);
-        }
+            => Ok(await _participantService.GetAllAsync());
 
         [HttpPost]
         [Consumes("multipart/form-data")]
@@ -45,6 +37,13 @@ namespace FuarYonetimSistemi.API.Controllers
         {
             try
             {
+                // JSON string'leri listeye çevir
+                dto.Branches = ParseJsonList<CreateBranchDto>(dto.BranchesJson);
+                dto.Brands = ParseJsonList<CreateBrandDto>(dto.BrandsJson);
+                dto.ProductCategories = ParseJsonList<CreateProductCategoryDto>(dto.ProductCategoriesJson);
+                dto.ExhibitedProducts = ParseJsonList<CreateExhibitedProductDto>(dto.ExhibitedProductsJson);
+                dto.RepresentativeCompanies = ParseJsonList<CreateRepresentativeCompanyDto>(dto.RepresentativeCompaniesJson);
+
                 var participant = await _participantService.CreateAsync(dto);
                 return CreatedAtAction(nameof(GetById), new { id = participant.Id }, participant);
             }
@@ -54,9 +53,46 @@ namespace FuarYonetimSistemi.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Katılımcı oluşturulurken bir hata oluştu." });
+                return StatusCode(500, new
+                {
+                    message = "Katılımcı oluşturulurken bir hata oluştu.",
+                    detail = ex.Message,
+                    stack = ex.StackTrace
+                });
             }
         }
+
+
+
+
+
+
+        private static List<T>? ParseJsonList<T>(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return null;
+
+            try
+            {
+                if (json.TrimStart().StartsWith("{"))
+                {
+                    var single = JsonConvert.DeserializeObject<T>(json);
+                    return single != null ? new List<T> { single } : null;
+                }
+
+                return JsonConvert.DeserializeObject<List<T>>(json);
+            }
+            catch (JsonException ex)
+            {
+                throw new ArgumentException($"Geçersiz JSON formatı: {ex.Message}");
+            }
+        }
+
+
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id) =>
+            await _participantService.GetByIdAsync(id) is { } p ? Ok(p) : NotFound();
 
         [HttpPut("{id}")]
         [Consumes("multipart/form-data")]
@@ -65,16 +101,13 @@ namespace FuarYonetimSistemi.API.Controllers
             try
             {
                 var participant = await _participantService.UpdateAsync(id, dto);
-                if (participant == null)
-                    return NotFound();
-
-                return Ok(participant);
+                return participant == null ? NotFound() : Ok(participant);
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, new { message = "Katılımcı güncellenirken bir hata oluştu." });
             }
@@ -84,20 +117,13 @@ namespace FuarYonetimSistemi.API.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var success = await _participantService.DeleteAsync(id);
-            if (!success)
-                return NotFound();
-
-            return NoContent();
+            return success ? NoContent() : NotFound();
         }
 
         [HttpPost("paged")]
         public async Task<IActionResult> GetPaged([FromBody] ParticipantFilterDto filter)
-        {
-            var result = await _participantService.FilterPagedAsync(filter);
-            return Ok(result);
-        }
+            => Ok(await _participantService.FilterPagedAsync(filter));
 
-        // Logo İşlemleri
         [HttpGet("{id}/logo")]
         public async Task<IActionResult> GetLogo(Guid id)
         {
@@ -106,34 +132,29 @@ namespace FuarYonetimSistemi.API.Controllers
                 return NotFound(new { message = "Logo bulunamadı." });
 
             var participant = await _participantService.GetByIdAsync(id);
-            if (participant == null)
-                return NotFound();
-
-            return File(logoBytes, participant.LogoContentType ?? "image/jpeg", participant.LogoFileName);
+            return participant == null
+                ? NotFound()
+                : File(logoBytes, participant.LogoContentType ?? "image/jpeg", participant.LogoFileName);
         }
 
-        // Excel Export
         [HttpGet("export-excel")]
         public async Task<IActionResult> ExportParticipantsToExcel()
         {
             var participants = await _participantService.GetAllAsync();
+            if (participants == null || !participants.Any())
+                return BadRequest(new { message = "Dışa aktarılacak katılımcı bulunamadı." });
 
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Participants");
 
-            // Başlıklar
-            worksheet.Cell(1, 1).Value = "Ad Soyad";
-            worksheet.Cell(1, 2).Value = "Firma";
-            worksheet.Cell(1, 3).Value = "Telefon";
-            worksheet.Cell(1, 4).Value = "Email";
-            worksheet.Cell(1, 5).Value = "Yetkili Kişi";
-            worksheet.Cell(1, 6).Value = "Adres";
-            worksheet.Cell(1, 7).Value = "Web Sitesi";
-            worksheet.Cell(1, 8).Value = "Şubeler";
-            worksheet.Cell(1, 9).Value = "Logo";
-            worksheet.Cell(1, 10).Value = "Kayıt Tarihi";
+            var headers = new[] {
+                "Ad Soyad", "Firma", "Telefon", "Email", "Yetkili Kişi", "Adres", "Web Sitesi",
+                "Şubeler", "Markalar", "Ürün Kategorileri", "Sergilenen Ürünler", "Temsilci Firmalar", "Logo", "Kayıt Tarihi"
+            };
 
-            // Başlık satırını kalın yap
+            for (int i = 0; i < headers.Length; i++)
+                worksheet.Cell(1, i + 1).Value = headers[i];
+
             worksheet.Row(1).Style.Font.Bold = true;
 
             int row = 2;
@@ -146,13 +167,16 @@ namespace FuarYonetimSistemi.API.Controllers
                 worksheet.Cell(row, 5).Value = p.AuthFullName;
                 worksheet.Cell(row, 6).Value = p.Address;
                 worksheet.Cell(row, 7).Value = p.Website;
-                worksheet.Cell(row, 8).Value = p.Branches;
-                worksheet.Cell(row, 9).Value = !string.IsNullOrEmpty(p.LogoFilePath) ? "Var" : "Yok";
-                worksheet.Cell(row, 10).Value = p.CreateDate.ToString("dd.MM.yyyy HH:mm");
+                worksheet.Cell(row, 8).Value = string.Join(", ", p.Branches?.Select(b => b.Name) ?? []);
+                worksheet.Cell(row, 9).Value = string.Join(", ", p.Brands?.Select(b => b.Name) ?? []);
+                worksheet.Cell(row, 10).Value = string.Join(", ", p.ProductCategories?.Select(c => c.Name) ?? []);
+                worksheet.Cell(row, 11).Value = string.Join(", ", p.ExhibitedProducts?.Select(e => e.Name) ?? []);
+                worksheet.Cell(row, 12).Value = string.Join("; ", p.RepresentativeCompanies?.Select(rc => $"{rc.Name} ({rc.Country})") ?? []);
+                worksheet.Cell(row, 13).Value = string.IsNullOrWhiteSpace(p.LogoFileName) ? "Yok" : "Var";
+                worksheet.Cell(row, 14).Value = p.CreateDate.ToString("dd.MM.yyyy HH:mm");
                 row++;
             }
 
-            // Sütun genişliklerini otomatik ayarla
             worksheet.Columns().AdjustToContents();
 
             using var stream = new MemoryStream();
@@ -160,82 +184,69 @@ namespace FuarYonetimSistemi.API.Controllers
             stream.Position = 0;
 
             return File(stream.ToArray(),
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"Participants_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"Participants_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
         }
 
-        // PDF Export - Tekil Katılımcı
         [HttpGet("{id}/export-pdf")]
         public async Task<IActionResult> ExportParticipantToPdf(Guid id)
         {
             var participant = await _participantService.GetByIdAsync(id);
-            if (participant == null)
-                return NotFound();
+            if (participant == null) return NotFound();
 
             try
             {
                 var pdfBytes = await _pdfService.GenerateParticipantPdfAsync(participant);
                 var fileName = $"{participant.FullName.Replace(" ", "_")}_Bilgileri_{DateTime.Now:yyyyMMdd}.pdf";
-
                 return File(pdfBytes, "application/pdf", fileName);
             }
-            catch (Exception ex)
+            catch
             {
                 return StatusCode(500, new { message = "PDF oluşturulurken bir hata oluştu." });
             }
         }
 
-        // PDF Export - Tüm Katılımcılar
         [HttpGet("export-pdf")]
         public async Task<IActionResult> ExportAllParticipantsToPdf()
         {
             try
             {
                 var participants = await _participantService.GetAllAsync();
+                if (participants == null || !participants.Any())
+                    return BadRequest(new { message = "Katılımcı verisi bulunamadı." });
+
                 var pdfBytes = await _pdfService.GenerateParticipantListPdfAsync(participants);
                 var fileName = $"Katilimci_Listesi_{DateTime.Now:yyyyMMdd_HHmm}.pdf";
 
                 return File(pdfBytes, "application/pdf", fileName);
             }
-            catch (Exception ex)
+            catch
             {
                 return StatusCode(500, new { message = "PDF oluşturulurken bir hata oluştu." });
             }
         }
 
-        // PDF Export - Filtrelenmiş Katılımcılar
         [HttpPost("export-pdf-filtered")]
         public async Task<IActionResult> ExportFilteredParticipantsToPdf([FromBody] ParticipantFilterDto filter)
         {
             try
             {
-                // Tüm kayıtları al (sayfalama olmadan)
-                var tempFilter = new ParticipantFilterDto
-                {
-                    FullName = filter.FullName,
-                    Email = filter.Email,
-                    AuthFullName = filter.AuthFullName,
-                    CompanyName = filter.CompanyName,
-                    CreateDate = filter.CreateDate,
-                    HasLogo = filter.HasLogo,
-                    SortBy = filter.SortBy,
-                    IsDescending = filter.IsDescending,
-                    PageNumber = 1,
-                    PageSize = int.MaxValue // Tüm kayıtları al
-                };
+                filter.PageNumber = 1;
+                filter.PageSize = int.MaxValue;
 
-                var result = await _participantService.FilterPagedAsync(tempFilter);
+                var result = await _participantService.FilterPagedAsync(filter);
+                if (result.Items == null || !result.Items.Any())
+                    return BadRequest(new { message = "Filtreye uygun katılımcı bulunamadı." });
+
                 var pdfBytes = await _pdfService.GenerateParticipantListPdfAsync(result.Items);
                 var fileName = $"Katilimci_Listesi_Filtreli_{DateTime.Now:yyyyMMdd_HHmm}.pdf";
 
                 return File(pdfBytes, "application/pdf", fileName);
             }
-            catch (Exception ex)
+            catch
             {
                 return StatusCode(500, new { message = "PDF oluşturulurken bir hata oluştu." });
             }
         }
-
-
     }
 }

@@ -22,6 +22,52 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Branch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.ToTable("Branches");
+                });
+
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Brand", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.ToTable("Brands");
+                });
+
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
@@ -36,6 +82,29 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.ExhibitedProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.ToTable("ExhibitedProducts");
                 });
 
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Fair", b =>
@@ -271,11 +340,6 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<string>("Branches")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -317,8 +381,8 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Website")
                         .IsRequired()
@@ -369,6 +433,87 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                     b.HasIndex("StandId");
 
                     b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.ProductCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.ToTable("ProductCategories");
+                });
+
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.RepresentativeCompany", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Website")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.ToTable("RepresentativeCompanies");
                 });
 
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Stand", b =>
@@ -560,6 +705,39 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Branch", b =>
+                {
+                    b.HasOne("FuarYonetimSistemi.Domain.Entities.Participant", "Participant")
+                        .WithMany("Branches")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+                });
+
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Brand", b =>
+                {
+                    b.HasOne("FuarYonetimSistemi.Domain.Entities.Participant", "Participant")
+                        .WithMany("Brands")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+                });
+
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.ExhibitedProduct", b =>
+                {
+                    b.HasOne("FuarYonetimSistemi.Domain.Entities.Participant", "Participant")
+                        .WithMany("ExhibitedProducts")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+                });
+
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Fair", b =>
                 {
                     b.HasOne("FuarYonetimSistemi.Domain.Entities.Category", "Category")
@@ -619,6 +797,28 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                     b.Navigation("Stand");
                 });
 
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.ProductCategory", b =>
+                {
+                    b.HasOne("FuarYonetimSistemi.Domain.Entities.Participant", "Participant")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+                });
+
+            modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.RepresentativeCompany", b =>
+                {
+                    b.HasOne("FuarYonetimSistemi.Domain.Entities.Participant", "Participant")
+                        .WithMany("RepresentativeCompanies")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+                });
+
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Stand", b =>
                 {
                     b.HasOne("FuarYonetimSistemi.Domain.Entities.Fair", "Fair")
@@ -657,6 +857,16 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
 
             modelBuilder.Entity("FuarYonetimSistemi.Domain.Entities.Participant", b =>
                 {
+                    b.Navigation("Branches");
+
+                    b.Navigation("Brands");
+
+                    b.Navigation("ExhibitedProducts");
+
+                    b.Navigation("ProductCategories");
+
+                    b.Navigation("RepresentativeCompanies");
+
                     b.Navigation("Stands");
                 });
 

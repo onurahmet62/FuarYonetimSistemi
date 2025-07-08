@@ -9,25 +9,26 @@ namespace FuarYonetimSistemi.Application.DTOs
 {
     public class UpdateParticipantDto
     {
+        // Temel alanlar
         public string FullName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-
-        // Yeni eklenen firma bilgileri
-        public string CompanyName { get; set; }  // Firma adı
-        public string Address { get; set; }      // Firma adresi
-      // Firma telefon numaraları
-        public string Website { get; set; }      // Firma web sitesi
-        public string Branches { get; set; }     // Firma şubeleri
-
-        public DateTime CreateDate { get; set; }
         public string AuthFullName { get; set; }
+        public string CompanyName { get; set; }
+        public string Address { get; set; }
+        public string Website { get; set; }
 
-        // Logo dosyası (opsiyonel - null ise mevcut logo korunur)
-        public IFormFile? LogoFile { get; set; }
+        // Logo işlemleri için
+        public bool RemoveLogo { get; set; }
+        public IFormFile LogoFile { get; set; }
 
-        // Logo silme kontrolü
-        public bool RemoveLogo { get; set; } = false;
+        // Mutlaka koleksiyon tipleri şöyle olmalı:
+        public ICollection<BranchDto> Branches { get; set; } = new List<BranchDto>();
+        public ICollection<BrandDto> Brands { get; set; } = new List<BrandDto>();
+        public ICollection<ProductCategoryDto> ProductCategories { get; set; } = new List<ProductCategoryDto>();
+        public ICollection<ExhibitedProductDto> ExhibitedProducts { get; set; } = new List<ExhibitedProductDto>();
+        public ICollection<RepresentativeCompanyDto> RepresentativeCompanies { get; set; } = new List<RepresentativeCompanyDto>();
     }
+
 
 }

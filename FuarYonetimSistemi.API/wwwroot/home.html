@@ -1,0 +1,202 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>ArDesk - Kapsamlı Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="css/theme.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <style>
+        .kpi-card .card-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kpi-card .text-content {
+            flex-grow: 1;
+        }
+
+        .kpi-card .icon-content {
+            font-size: 2.8rem;
+            opacity: 0.2;
+        }
+
+        .kpi-card .h5 {
+            font-size: 1.7rem;
+        }
+
+        .border-left-orange {
+            border-left: 0.25rem solid #fd7e14 !important;
+        }
+
+        .text-orange {
+            color: #fd7e14 !important;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+
+        .list-group-item {
+            background-color: transparent;
+            border-left: 0;
+            border-right: 0;
+        }
+
+            .list-group-item:first-child {
+                border-top: 0;
+            }
+
+            .list-group-item:last-child {
+                border-bottom: 0;
+            }
+
+        /* Filtreleme barı için stiller */
+        .filter-bar {
+            background-color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
+        }
+    </style>
+</head>
+<body id="page-top">
+    <div id="loadingOverlay" style="display: none;">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor...</span></div>
+    </div>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
+            <!-- JS ile doldurulacak -->
+        </ul>
+        <!-- End of Sidebar -->
+
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <!-- Topbar -->
+                <nav id="topbar-placeholder" class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <!-- JS ile doldurulacak -->
+                </nav>
+                <!-- End of Topbar -->
+                <!-- Ana İçerik -->
+                <div class="container-fluid">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Şirket Paneli</h1>
+                    </div>
+
+                    <!-- Gelişmiş Filtreleme Alanı -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body filter-bar">
+                            <form id="dashboardFilterForm" class="row gx-2 gy-2 align-items-end">
+                                <div class="col-md-5">
+                                    <label for="dashboardFairFilter" class="form-label-sm">Fuara Göre Filtrele</label>
+                                    <select class="form-select form-select-sm" id="dashboardFairFilter">
+                                        <option value="all">Tüm Fuarlar</option>
+                                        <!-- Fuarlar JS ile yüklenecek -->
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="dashboardStartDate" class="form-label-sm">Başlangıç Tarihi</label>
+                                    <input type="date" class="form-control form-control-sm" id="dashboardStartDate">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="dashboardEndDate" class="form-label-sm">Bitiş Tarihi</label>
+                                    <input type="date" class="form-control form-control-sm" id="dashboardEndDate">
+                                </div>
+                                <div class="col-md-1 d-grid">
+                                    <label class="form-label-sm d-block">&nbsp;</label>
+                                    <button type="button" class="btn btn-secondary btn-sm" id="clearDashboardFilters" title="Filtreleri Temizle"><i class="bi bi-eraser"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- KPI Kartları -->
+                    <div class="row">
+                        <div class="col-xl-3 col-md-6 mb-4"><div class="card kpi-card border-left-success shadow h-100 py-2"><div class="card-body"><div class="text-content"><div class="text-xs font-weight-bold text-success text-uppercase mb-1">Toplam Gelir</div><div class="h5 mb-0 font-weight-bold text-gray-800" id="totalRevenue">Yükleniyor...</div></div><div class="icon-content"><i class="bi bi-cash-coin"></i></div></div></div></div>
+                        <div class="col-xl-3 col-md-6 mb-4"><div class="card kpi-card border-left-danger shadow h-100 py-2"><div class="card-body"><div class="text-content"><div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Toplam Gider</div><div class="h5 mb-0 font-weight-bold text-gray-800" id="totalExpenses">Yükleniyor...</div></div><div class="icon-content"><i class="bi bi-receipt"></i></div></div></div></div>
+                        <div class="col-xl-3 col-md-6 mb-4"><div class="card kpi-card border-left-primary shadow h-100 py-2"><div class="card-body"><div class="text-content"><div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Net Kâr</div><div class="h5 mb-0 font-weight-bold text-gray-800" id="netProfit">Yükleniyor...</div></div><div class="icon-content"><i class="bi bi-piggy-bank-fill"></i></div></div></div></div>
+                        <div class="col-xl-3 col-md-6 mb-4"><div class="card kpi-card border-left-orange shadow h-100 py-2"><div class="card-body"><div class="text-content"><div class="text-xs font-weight-bold text-orange text-uppercase mb-1">Katılımcı Başına Gelir</div><div class="h5 mb-0 font-weight-bold text-gray-800" id="revenuePerParticipant">Yükleniyor...</div></div><div class="icon-content"><i class="bi bi-person-check-fill"></i></div></div></div></div>
+                    </div>
+
+                    <!-- Grafikler Satırı 1 -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Aylık Finansal Trend</h6></div>
+                                <div class="card-body"><div class="chart-container"><canvas id="monthlyTrendChart"></canvas></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grafikler Satırı 2 -->
+                    <div class="row">
+                        <div class="col-lg-8 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Fuarların Kârlılık Analizi</h6></div>
+                                <div class="card-body"><div class="chart-container"><canvas id="fairProfitabilityChart"></canvas></div></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Ödeme Yöntemleri</h6></div>
+                                <div class="card-body d-flex align-items-center justify-content-center"><div class="chart-container" style="height:280px"><canvas id="paymentMethodsChart"></canvas></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Listeler Satırı -->
+                    <div class="row">
+                        <div class="col-lg-5 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">En Çok Ödeme Yapan Katılımcılar</h6></div>
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush" id="topParticipantsList">
+                                        <!-- JS ile dolacak -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-7 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Son Finansal İşlemler</h6></div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover mb-0" id="recentTransactionsTable">
+                                            <tbody><!-- JS ile dolacak --></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white shadow-sm py-3 mt-auto"><div class="container-fluid"><div class="text-center small text-muted">Copyright &copy; ArDesk 2025</div></div></footer>
+        </div>
+    </div>
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="exampleModalLabel">Çıkış Yapmaya Hazır mısınız?</h5><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body">Mevcut oturumunuzu sonlandırmak için "Çıkış Yap"ı seçin.</div>
+                <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">İptal</button><a class="btn btn-primary" id="confirmLogoutBtn" href="#">Çıkış Yap</a></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/core.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/pages/homeDashboard.js"></script>
+</body>
+</html>

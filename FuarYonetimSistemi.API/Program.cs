@@ -91,39 +91,47 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// CORS policy
+// 🔐 CORS Policy (şu an tüm kaynaklara izin verir, üretimde kısıtlayabilirsiniz)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy
+            .AllowAnyOrigin()  // 👈 Tüm domainlerden gelen isteklere izin ver
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
+
 var app = builder.Build();
 
+// Apply CORS before any middleware that might return responses
+app.UseCors("AllowAll");
 
-// URL rewrite: "/" isteği => "/AZB/index.html"
+// HTTPS Redirect
+app.UseHttpsRedirection();
+
+// Static content and URL rewrite
 app.UseRewriter(new RewriteOptions()
     .AddRewrite("^$", "index.html", skipRemainingRules: true));
-
-// Static files
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Auth middleware
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("AllowAll");
 
+// Map Controllers
 app.MapControllers();
 
+// Run app
 app.Run();
+

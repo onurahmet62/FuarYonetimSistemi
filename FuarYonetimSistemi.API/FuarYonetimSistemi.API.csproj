@@ -6,6 +6,133 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Include="wwwroot\.vs\Ardesk\v17\DocumentLayout.backup.json" />
+    <Content Include="wwwroot\.vs\Ardesk\v17\DocumentLayout.json" />
+    <Content Include="wwwroot\.vs\AZB\v17\DocumentLayout.backup.json" />
+    <Content Include="wwwroot\.vs\AZB\v17\DocumentLayout.json" />
+    <Content Include="wwwroot\.vs\VSWorkspaceState.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\.vs\Ardesk\config\applicationhost.config" />
+    <None Include="wwwroot\.vs\Ardesk\copilot-chat\4c528c85\sessions\3e5c75a2-99df-4a38-9684-100844b05393" />
+    <None Include="wwwroot\.vs\Ardesk\copilot-chat\4c528c85\sessions\be075214-e8f9-4af1-a0f9-0b9312166152" />
+    <None Include="wwwroot\.vs\Ardesk\CopilotIndices\17.13.444.19527\CodeChunks.db" />
+    <None Include="wwwroot\.vs\Ardesk\CopilotIndices\17.13.444.19527\CodeChunks.db-shm" />
+    <None Include="wwwroot\.vs\Ardesk\CopilotIndices\17.13.444.19527\SemanticSymbols.db" />
+    <None Include="wwwroot\.vs\Ardesk\CopilotIndices\17.13.444.19527\SemanticSymbols.db-shm" />
+    <None Include="wwwroot\.vs\Ardesk\FileContentIndex\3b3e9703-0c9b-46eb-8505-eec0fe4940c8.vsidx" />
+    <None Include="wwwroot\.vs\Ardesk\FileContentIndex\5f4b6e1b-7897-4fa4-9a67-337a40594490.vsidx" />
+    <None Include="wwwroot\.vs\Ardesk\FileContentIndex\8ad30677-a1ed-477e-8d90-5671a92c7bf8.vsidx" />
+    <None Include="wwwroot\.vs\Ardesk\FileContentIndex\bf1089eb-5c63-4687-b9a0-11beb63b230c.vsidx" />
+    <None Include="wwwroot\.vs\Ardesk\FileContentIndex\f55b41af-a0b3-47fd-8338-87288947cf56.vsidx" />
+    <None Include="wwwroot\.vs\Ardesk\v17\.wsuo" />
+    <None Include="wwwroot\.vs\Ardesk\v17\workspaceFileList.bin" />
+    <None Include="wwwroot\.vs\AZB\config\applicationhost.config" />
+    <None Include="wwwroot\.vs\AZB\CopilotIndices\17.13.444.19527\CodeChunks.db" />
+    <None Include="wwwroot\.vs\AZB\CopilotIndices\17.13.444.19527\SemanticSymbols.db" />
+    <None Include="wwwroot\.vs\AZB\FileContentIndex\3b475c1d-23f5-4719-9efd-d4232c3c2339.vsidx" />
+    <None Include="wwwroot\.vs\AZB\FileContentIndex\4a31e503-36b8-4aa7-9f7b-340e6e083e21.vsidx" />
+    <None Include="wwwroot\.vs\AZB\FileContentIndex\6b18cf41-5e69-40c2-aa85-8d4d54cd3de7.vsidx" />
+    <None Include="wwwroot\.vs\AZB\FileContentIndex\848e77ea-5a1c-48db-86b6-e1052fd376fe.vsidx" />
+    <None Include="wwwroot\.vs\AZB\FileContentIndex\e3131776-22c1-4fea-bf66-70475006a1eb.vsidx" />
+    <None Include="wwwroot\.vs\slnx.sqlite" />
+    <None Include="wwwroot\node_modules\.bin\acorn" />
+    <None Include="wwwroot\node_modules\.bin\acorn.cmd" />
+    <None Include="wwwroot\node_modules\.bin\acorn.ps1" />
+    <None Include="wwwroot\node_modules\.bin\atob" />
+    <None Include="wwwroot\node_modules\.bin\atob.cmd" />
+    <None Include="wwwroot\node_modules\.bin\atob.ps1" />
+    <None Include="wwwroot\node_modules\.bin\autoprefixer" />
+    <None Include="wwwroot\node_modules\.bin\autoprefixer.cmd" />
+    <None Include="wwwroot\node_modules\.bin\autoprefixer.ps1" />
+    <None Include="wwwroot\node_modules\.bin\browser-sync" />
+    <None Include="wwwroot\node_modules\.bin\browser-sync.cmd" />
+    <None Include="wwwroot\node_modules\.bin\browser-sync.ps1" />
+    <None Include="wwwroot\node_modules\.bin\browserslist" />
+    <None Include="wwwroot\node_modules\.bin\browserslist.cmd" />
+    <None Include="wwwroot\node_modules\.bin\browserslist.ps1" />
+    <None Include="wwwroot\node_modules\.bin\color-support" />
+    <None Include="wwwroot\node_modules\.bin\color-support.cmd" />
+    <None Include="wwwroot\node_modules\.bin\color-support.ps1" />
+    <None Include="wwwroot\node_modules\.bin\dev-ip" />
+    <None Include="wwwroot\node_modules\.bin\dev-ip.cmd" />
+    <None Include="wwwroot\node_modules\.bin\dev-ip.ps1" />
+    <None Include="wwwroot\node_modules\.bin\eslint" />
+    <None Include="wwwroot\node_modules\.bin\eslint.cmd" />
+    <None Include="wwwroot\node_modules\.bin\eslint.ps1" />
+    <None Include="wwwroot\node_modules\.bin\gulp" />
+    <None Include="wwwroot\node_modules\.bin\gulp.cmd" />
+    <None Include="wwwroot\node_modules\.bin\gulp.ps1" />
+    <None Include="wwwroot\node_modules\.bin\in-install" />
+    <None Include="wwwroot\node_modules\.bin\in-install.cmd" />
+    <None Include="wwwroot\node_modules\.bin\in-install.ps1" />
+    <None Include="wwwroot\node_modules\.bin\in-publish" />
+    <None Include="wwwroot\node_modules\.bin\in-publish.cmd" />
+    <None Include="wwwroot\node_modules\.bin\in-publish.ps1" />
+    <None Include="wwwroot\node_modules\.bin\js-yaml" />
+    <None Include="wwwroot\node_modules\.bin\js-yaml.cmd" />
+    <None Include="wwwroot\node_modules\.bin\js-yaml.ps1" />
+    <None Include="wwwroot\node_modules\.bin\lt" />
+    <None Include="wwwroot\node_modules\.bin\lt.cmd" />
+    <None Include="wwwroot\node_modules\.bin\lt.ps1" />
+    <None Include="wwwroot\node_modules\.bin\mime" />
+    <None Include="wwwroot\node_modules\.bin\mime.cmd" />
+    <None Include="wwwroot\node_modules\.bin\mime.ps1" />
+    <None Include="wwwroot\node_modules\.bin\mkdirp" />
+    <None Include="wwwroot\node_modules\.bin\mkdirp.cmd" />
+    <None Include="wwwroot\node_modules\.bin\mkdirp.ps1" />
+    <None Include="wwwroot\node_modules\.bin\node-gyp" />
+    <None Include="wwwroot\node_modules\.bin\node-gyp.cmd" />
+    <None Include="wwwroot\node_modules\.bin\node-gyp.ps1" />
+    <None Include="wwwroot\node_modules\.bin\node-sass" />
+    <None Include="wwwroot\node_modules\.bin\node-sass.cmd" />
+    <None Include="wwwroot\node_modules\.bin\node-sass.ps1" />
+    <None Include="wwwroot\node_modules\.bin\nopt" />
+    <None Include="wwwroot\node_modules\.bin\nopt.cmd" />
+    <None Include="wwwroot\node_modules\.bin\nopt.ps1" />
+    <None Include="wwwroot\node_modules\.bin\not-in-install" />
+    <None Include="wwwroot\node_modules\.bin\not-in-install.cmd" />
+    <None Include="wwwroot\node_modules\.bin\not-in-install.ps1" />
+    <None Include="wwwroot\node_modules\.bin\not-in-publish" />
+    <None Include="wwwroot\node_modules\.bin\not-in-publish.cmd" />
+    <None Include="wwwroot\node_modules\.bin\not-in-publish.ps1" />
+    <None Include="wwwroot\node_modules\.bin\rimraf" />
+    <None Include="wwwroot\node_modules\.bin\rimraf.cmd" />
+    <None Include="wwwroot\node_modules\.bin\rimraf.ps1" />
+    <None Include="wwwroot\node_modules\.bin\sassgraph" />
+    <None Include="wwwroot\node_modules\.bin\sassgraph.cmd" />
+    <None Include="wwwroot\node_modules\.bin\sassgraph.ps1" />
+    <None Include="wwwroot\node_modules\.bin\semver" />
+    <None Include="wwwroot\node_modules\.bin\semver.cmd" />
+    <None Include="wwwroot\node_modules\.bin\semver.ps1" />
+    <None Include="wwwroot\node_modules\.bin\sshpk-conv" />
+    <None Include="wwwroot\node_modules\.bin\sshpk-conv.cmd" />
+    <None Include="wwwroot\node_modules\.bin\sshpk-conv.ps1" />
+    <None Include="wwwroot\node_modules\.bin\sshpk-sign" />
+    <None Include="wwwroot\node_modules\.bin\sshpk-sign.cmd" />
+    <None Include="wwwroot\node_modules\.bin\sshpk-sign.ps1" />
+    <None Include="wwwroot\node_modules\.bin\sshpk-verify" />
+    <None Include="wwwroot\node_modules\.bin\sshpk-verify.cmd" />
+    <None Include="wwwroot\node_modules\.bin\sshpk-verify.ps1" />
+    <None Include="wwwroot\node_modules\.bin\strip-indent" />
+    <None Include="wwwroot\node_modules\.bin\strip-indent.cmd" />
+    <None Include="wwwroot\node_modules\.bin\strip-indent.ps1" />
+    <None Include="wwwroot\node_modules\.bin\throttleproxy" />
+    <None Include="wwwroot\node_modules\.bin\throttleproxy.cmd" />
+    <None Include="wwwroot\node_modules\.bin\throttleproxy.ps1" />
+    <None Include="wwwroot\node_modules\.bin\uglifyjs" />
+    <None Include="wwwroot\node_modules\.bin\uglifyjs.cmd" />
+    <None Include="wwwroot\node_modules\.bin\uglifyjs.ps1" />
+    <None Include="wwwroot\node_modules\.bin\uuid" />
+    <None Include="wwwroot\node_modules\.bin\uuid.cmd" />
+    <None Include="wwwroot\node_modules\.bin\uuid.ps1" />
+    <None Include="wwwroot\node_modules\.bin\which" />
+    <None Include="wwwroot\node_modules\.bin\which.cmd" />
+    <None Include="wwwroot\node_modules\.bin\which.ps1" />
+  </ItemGroup>
+
 
 
 
@@ -34,9 +161,4 @@
     <ProjectReference Include="..\FuarYonetimSistemi.Application\FuarYonetimSistemi.Application.csproj" />
     <ProjectReference Include="..\FuarYonetimSistemi.Infrastructure\FuarYonetimSistemi.Infrastructure.csproj" />
   </ItemGroup>
-
-	<ItemGroup>
-		<Content Remove="wwwroot\.vs\**" />
-		<None Remove="wwwroot\.vs\**" />
-	</ItemGroup>
 </Project>

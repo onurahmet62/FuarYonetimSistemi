@@ -317,6 +317,60 @@ namespace FuarYonetimSistemi.Application.Services
                 .ToListAsync();
         }
 
+        public async Task<FairDto?> UpdateFairAsync(FairUpdateDto fairDto)
+        {
+            var fair = await _context.Fairs.FirstOrDefaultAsync(f => f.Id == fairDto.Id && !f.IsDeleted);
+            if (fair == null) return null;
+
+            // Yeni kategori adı verildiyse işle
+            if (!string.IsNullOrWhiteSpace(fairDto.NewCategoryName))
+            {
+                var existingCategory = await _context.Categories
+                    .FirstOrDefaultAsync(c => c.Name == fairDto.NewCategoryName);
+
+                if (existingCategory != null)
+                    fairDto.CategoryId = existingCategory.Id;
+                else
+                {
+                    var newCategory = new Category { Id = Guid.NewGuid(), Name = fairDto.NewCategoryName };
+                    _context.Categories.Add(newCategory);
+                    await _context.SaveChangesAsync(); // kategori id’ye sahip olmak için
+                    fairDto.CategoryId = newCategory.Id;
+                }
+            }
+
+            // Alanları güncelle
+            fair.Name = fairDto.Name;
+            fair.Location = fairDto.Location;
+            fair.Organizer = fairDto.Organizer;
+            fair.Year = fairDto.Year;
+            fair.StartDate = fairDto.StartDate;
+            fair.EndDate = fairDto.EndDate;
+            fair.CategoryId = fairDto.CategoryId;
+
+            fair.FairType = fairDto.FairType;
+            fair.Website = fairDto.Website;
+            fair.Email = fairDto.Email;
+            fair.TotalParticipantCount = fairDto.TotalParticipantCount;
+            fair.ForeignParticipantCount = fairDto.ForeignParticipantCount;
+            fair.TotalVisitorCount = fairDto.TotalVisitorCount;
+            fair.ForeignVisitorCount = fairDto.ForeignVisitorCount;
+            fair.TotalStandArea = fairDto.TotalStandArea;
+            fair.ParticipatingCountries = fairDto.ParticipatingCountries;
+            fair.Budget = fairDto.Budget;
+            fair.RevenueTarget = fairDto.RevenueTarget;
+            fair.ExpenseTarget = fairDto.ExpenseTarget;
+            fair.NetProfitTarget = fairDto.NetProfitTarget;
+            fair.ActualRevenue = fairDto.ActualRevenue;
+            fair.ActualExpense = fairDto.ActualExpense;
+            fair.ActualNetProfit = fairDto.ActualNetProfit;
+
+            await _context.SaveChangesAsync();
+
+            return await GetFairByIdAsync(fair.Id); // tekrar DTO'ya maplenmiş hali
+        }
+
+
     }
 
 }

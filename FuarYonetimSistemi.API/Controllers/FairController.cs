@@ -101,6 +101,21 @@ namespace FuarYonetimSistemi.API.Controllers
             return Ok(fairs);
         }
 
+        // PUT: api/Fair
+        [HttpPut]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> UpdateFair([FromBody] FairUpdateDto fairDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var updatedFair = await _fairService.UpdateFairAsync(fairDto);
+            if (updatedFair == null)
+                return NotFound();
+
+            return Ok(updatedFair);
+        }
+
 
     }
 

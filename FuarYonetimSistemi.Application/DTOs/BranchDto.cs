@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FuarYonetimSistemi.Application.DTOs
+{
+    public class BranchDto
+    {
+        public string Name { get; set; }
+        // Potentially other properties if your Branch entity has them and you need to map them
+    }
+}
