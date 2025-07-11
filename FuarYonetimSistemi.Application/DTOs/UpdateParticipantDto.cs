@@ -20,7 +20,7 @@ namespace FuarYonetimSistemi.Application.DTOs
 
         // Logo işlemleri için
         public bool RemoveLogo { get; set; }
-        public IFormFile LogoFile { get; set; }
+        public IFormFile? LogoFile { get; set; }
 
         // Mutlaka koleksiyon tipleri şöyle olmalı:
         public ICollection<BranchDto> Branches { get; set; } = new List<BranchDto>();
