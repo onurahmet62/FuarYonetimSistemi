@@ -24,6 +24,8 @@ namespace FuarYonetimSistemi.Infrastructure.Data
         public DbSet<RepresentativeCompany> RepresentativeCompanies { get; set; }
         public DbSet<ExhibitedProduct> ExhibitedProducts { get; set; }
 
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<SharedFile> SharedFiles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -134,6 +136,18 @@ namespace FuarYonetimSistemi.Infrastructure.Data
                 .HasForeignKey(p => p.StandId)
                 .OnDelete(DeleteBehavior.NoAction);
             #endregion
+
+            modelBuilder.Entity<Message>()
+          .HasOne(m => m.Sender)
+          .WithMany()
+          .HasForeignKey(m => m.SenderId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

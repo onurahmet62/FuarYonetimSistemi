@@ -36,11 +36,8 @@ namespace FuarYonetimSistemi.Application.Services
 
         public async Task<Payment> AddAsync(PaymentCreateDto dto)
         {
-            var stand = await _context.Stands
-                .FirstOrDefaultAsync(s => s.Id == dto.StandId && !s.IsDeleted);
-
-            if (stand == null)
-                throw new Exception("Stand bulunamadı.");
+            var stand = await _context.Stands.FirstOrDefaultAsync(s => s.Id == dto.StandId && !s.IsDeleted);
+            if (stand == null) throw new Exception("Stand bulunamadı.");
 
             var payment = new Payment
             {
@@ -56,21 +53,19 @@ namespace FuarYonetimSistemi.Application.Services
 
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
-
             return payment;
         }
 
-        public async Task<Payment?> UpdateAsync(Guid id, Payment updatedPayment)
+        public async Task<Payment?> UpdateAsync(Guid id, PaymentUpdateDto dto)
         {
             var payment = await _context.Payments.FindAsync(id);
-            if (payment == null || payment.IsDeleted)
-                return null;
+            if (payment == null || payment.IsDeleted) return null;
 
-            payment.PaymentDate = updatedPayment.PaymentDate;
-            payment.Amount = updatedPayment.Amount;
-            payment.PaymentMethod = updatedPayment.PaymentMethod;
-            payment.PaymentDescription = updatedPayment.PaymentDescription;
-            payment.ReceivedBy = updatedPayment.ReceivedBy;
+            payment.PaymentDate = dto.PaymentDate;
+            payment.Amount = dto.Amount;
+            payment.PaymentMethod = dto.PaymentMethod;
+            payment.PaymentDescription = dto.PaymentDescription;
+            payment.ReceivedBy = dto.ReceivedBy;
 
             await _context.SaveChangesAsync();
             return payment;
@@ -79,15 +74,14 @@ namespace FuarYonetimSistemi.Application.Services
         public async Task<bool> DeleteAsync(Guid id)
         {
             var payment = await _context.Payments.FindAsync(id);
-            if (payment == null || payment.IsDeleted)
-                return false;
+            if (payment == null || payment.IsDeleted) return false;
 
             payment.IsDeleted = true;
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<IEnumerable<Payment>> GetFilteredAsync(PaymentFilterDto filter)
+        public async Task<PagedResult<Payment>> GetFilteredAsync(PaymentFilterDto filter)
         {
             var query = _context.Payments
                 .Include(p => p.Stand)
@@ -110,7 +104,8 @@ namespace FuarYonetimSistemi.Application.Services
             if (filter.ParticipantId.HasValue)
                 query = query.Where(p => p.Stand.ParticipantId == filter.ParticipantId.Value);
 
-            // Sıralama
+            var totalCount = await query.CountAsync();
+
             query = filter.SortBy switch
             {
                 "Amount" => filter.SortDescending ? query.OrderByDescending(p => p.Amount) : query.OrderBy(p => p.Amount),
@@ -118,10 +113,13 @@ namespace FuarYonetimSistemi.Application.Services
                 _ => filter.SortDescending ? query.OrderByDescending(p => p.PaymentDate) : query.OrderBy(p => p.PaymentDate),
             };
 
-            // Sayfalama
             query = query.Skip((filter.Page - 1) * filter.PageSize).Take(filter.PageSize);
 
-            return await query.ToListAsync();
+            return new PagedResult<Payment>
+            {
+                Items = await query.ToListAsync(),
+                TotalCount = totalCount
+            };
         }
 
         public async Task<PaymentWithStandAndFairDto?> GetWithStandAndFairAsync(Guid id)
@@ -159,7 +157,5 @@ namespace FuarYonetimSistemi.Application.Services
                 }
             };
         }
-
-    
     }
 }

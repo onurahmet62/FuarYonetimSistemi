@@ -24,6 +24,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Fuar Yönetim Sistemi API", Version = "v1" });
+        
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -49,6 +50,7 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
+    options.OperationFilter<FileUploadOperation>();
 });
 
 // Add DbContext
@@ -69,6 +71,9 @@ builder.Services.AddScoped<IFairExpenseService, FairExpenseService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<ISharedFileService, SharedFileService>();
+
 
 builder.Services.AddHttpContextAccessor();
 

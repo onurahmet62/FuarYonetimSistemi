@@ -21,9 +21,7 @@ namespace FuarYonetimSistemi.WebApi.Controllers
             _paymentService = paymentService;
         }
 
-        /// <summary>
-        /// Tüm ödemeleri getirir.
-        /// </summary>
+        /// <summary>Tüm ödemeleri getirir.</summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Payment>>> GetAll()
         {
@@ -31,19 +29,15 @@ namespace FuarYonetimSistemi.WebApi.Controllers
             return Ok(payments);
         }
 
-        /// <summary>
-        /// Filtreleme, sıralama ve sayfalama ile ödeme listesi.
-        /// </summary>
+        /// <summary>Filtreleme, sıralama ve sayfalama ile ödeme listesi.</summary>
         [HttpPost("filter")]
-        public async Task<ActionResult<IEnumerable<Payment>>> GetFiltered([FromBody] PaymentFilterDto filter)
+        public async Task<ActionResult<PagedResult<Payment>>> GetFiltered([FromBody] PaymentFilterDto filter)
         {
             var payments = await _paymentService.GetFilteredAsync(filter);
             return Ok(payments);
         }
 
-        /// <summary>
-        /// Ödeme ID'sine göre ödeme bilgisi getirir.
-        /// </summary>
+        /// <summary>Ödeme ID'sine göre ödeme bilgisi getirir.</summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<Payment>> GetById(Guid id)
         {
@@ -52,9 +46,7 @@ namespace FuarYonetimSistemi.WebApi.Controllers
             return Ok(payment);
         }
 
-        /// <summary>
-        /// Belirli bir ödeme ile birlikte Stand ve Fuar bilgilerini getirir.
-        /// </summary>
+        /// <summary>Belirli bir ödeme ile birlikte Stand ve Fuar bilgilerini getirir.</summary>
         [HttpGet("{id}/detail")]
         public async Task<ActionResult<PaymentWithStandAndFairDto>> GetWithStandAndFair(Guid id)
         {
@@ -63,10 +55,7 @@ namespace FuarYonetimSistemi.WebApi.Controllers
             return Ok(result);
         }
 
-
-        /// <summary>
-        /// Yeni ödeme oluşturur.
-        /// </summary>
+        /// <summary>Yeni ödeme oluşturur.</summary>
         [HttpPost]
         public async Task<ActionResult<Payment>> Create([FromBody] PaymentCreateDto dto)
         {
@@ -81,20 +70,23 @@ namespace FuarYonetimSistemi.WebApi.Controllers
             }
         }
 
-        /// <summary>
-        /// Ödeme güncelleme.
-        /// </summary>
+        /// <summary>Ödeme güncelleme.</summary>
         [HttpPut("{id}")]
-        public async Task<ActionResult<Payment>> Update(Guid id, [FromBody] Payment payment)
+        public async Task<ActionResult<Payment>> Update(Guid id, [FromBody] PaymentUpdateDto dto)
         {
-            var updated = await _paymentService.UpdateAsync(id, payment);
-            if (updated == null) return NotFound();
-            return Ok(updated);
+            try
+            {
+                var updated = await _paymentService.UpdateAsync(id, dto);
+                if (updated == null) return NotFound();
+                return Ok(updated);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        /// <summary>
-        /// Ödeme silme (soft delete).
-        /// </summary>
+        /// <summary>Ödeme silme (soft delete).</summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
