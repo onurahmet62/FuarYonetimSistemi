@@ -27,90 +27,81 @@ namespace FuarYonetimSistemi.Application.Services
 
         public async Task<ParticipantDto> CreateAsync(CreateParticipantDto dto)
         {
-            var participant = new Participant
+            // ✅ Duplicate email kontrolü
+            var existingParticipant = await _context.Participants
+                .FirstOrDefaultAsync(p => p.Email == dto.Email && !p.IsDeleted);
+
+            if (existingParticipant != null)
             {
-                Id = Guid.NewGuid(),
-                FullName = dto.FullName,
-                Email = dto.Email,
-                Phone = dto.Phone,
-                AuthFullName = dto.AuthFullName,
-                CompanyName = dto.CompanyName,
-                Address = dto.Address,
-                Website = dto.Website,
-                CreateDate = DateTime.UtcNow,
-                IsDeleted = false,
-                Branches = dto.Branches?.Select(b => new Branch { Name = b.Name }).ToList(),
-                Brands = dto.Brands?.Select(b => new Brand { Name = b.Name }).ToList(),
-                ProductCategories = dto.ProductCategories?.Select(c => new ProductCategory { Name = c.Name }).ToList(),
-                ExhibitedProducts = dto.ExhibitedProducts?.Select(p => new ExhibitedProduct { Name = p.Name }).ToList(),
-                RepresentativeCompanies = dto.RepresentativeCompanies?.Select(r => new RepresentativeCompany
+                throw new InvalidOperationException($"Bu email adresi ({dto.Email}) ile kayıtlı bir katılımcı zaten mevcut.");
+            }
+
+            // ✅ Transaction kullan
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var participant = new Participant
                 {
-                    Name = r.Name,
-                    Country = r.Country,
-                    Address = r.Address,
-                    District = r.District,
-                    City = r.City,
-                    Phone = r.Phone,
-                    Email = r.Email,
-                    Website = r.Website
-                }).ToList()
-            };
+                    Id = Guid.NewGuid(),
+                    FullName = dto.FullName,
+                    Email = dto.Email,
+                    Phone = dto.Phone,
+                    AuthFullName = dto.AuthFullName,
+                    CompanyName = dto.CompanyName,
+                    Address = dto.Address,
+                    Website = dto.Website,
+                    CreateDate = DateTime.UtcNow,
+                    IsDeleted = false,
+                    Branches = dto.Branches?.Select(b => new Branch { Name = b.Name }).ToList() ?? new List<Branch>(),
+                    Brands = dto.Brands?.Select(b => new Brand { Name = b.Name }).ToList() ?? new List<Brand>(),
+                    ProductCategories = dto.ProductCategories?.Select(c => new ProductCategory { Name = c.Name }).ToList() ?? new List<ProductCategory>(),
+                    ExhibitedProducts = dto.ExhibitedProducts?.Select(p => new ExhibitedProduct { Name = p.Name }).ToList() ?? new List<ExhibitedProduct>(),
+                    RepresentativeCompanies = dto.RepresentativeCompanies?.Select(r => new RepresentativeCompany
+                    {
+                        Name = r.Name,
+                        Country = r.Country,
+                        Address = r.Address,
+                        District = r.District,
+                        City = r.City,
+                        Phone = r.Phone,
+                        Email = r.Email,
+                        Website = r.Website
+                    }).ToList() ?? new List<RepresentativeCompany>()
+                };
 
-            _context.Participants.Add(participant);
-            await _context.SaveChangesAsync();
+                // ✅ Önce DB'ye kaydet
+                _context.Participants.Add(participant);
+                await _context.SaveChangesAsync();
 
-            return MapToDto(participant);
-        }
+                // ✅ DB kaydı başarılıysa logo yükle
+                if (dto.LogoFile != null)
+                {
+                    try
+                    {
+                        await HandleLogoUpload(dto.LogoFile, participant);
+                        await _context.SaveChangesAsync(); // Logo bilgilerini güncelle
+                    }
+                    catch (Exception ex)
+                    {
+                        // Logo yükleme başarısız, transaction rollback
+                        await transaction.RollbackAsync();
+                        throw new InvalidOperationException($"Logo yüklenirken hata oluştu: {ex.Message}", ex);
+                    }
+                }
 
+                // ✅ Her şey başarılı, commit
+                await transaction.CommitAsync();
 
-        private async Task HandleLogoUpload(IFormFile file, Participant participant)
-        {
-            using var image = await Image.LoadAsync(file.OpenReadStream());
-            if (file.Length > 1024 * 1024 || image.Width > 500 || image.Height > 300)
-                throw new Exception("Logo 1MB'ı aşmamalı ve en fazla 500x300 piksel olmalı.");
-
-            var (fileName, filePath, fileSize) = await _fileService.UploadFileAsync(file, "participant-logos");
-            participant.LogoFileName = fileName;
-            participant.LogoFilePath = filePath;
-            participant.LogoContentType = file.ContentType;
-            participant.LogoFileSize = fileSize;
-            participant.LogoUploadDate = DateTime.UtcNow;
-        }
-
-        private ParticipantDto MapToDto(Participant p) => new()
-        {
-            Id = p.Id,
-            FullName = p.FullName,
-            Email = p.Email,
-            Phone = p.Phone,
-            AuthFullName = p.AuthFullName,
-            CompanyName = p.CompanyName,
-            Address = p.Address,
-            Website = p.Website,
-            CreateDate = p.CreateDate,
-            Branches = p.Branches?.Select(b => new BranchDto { Name = b.Name }).ToList(),
-            Brands = p.Brands?.Select(b => new BrandDto { Name = b.Name }).ToList(),
-            ProductCategories = p.ProductCategories?.Select(c => new ProductCategoryDto { Name = c.Name }).ToList(),
-            ExhibitedProducts = p.ExhibitedProducts?.Select(p => new ExhibitedProductDto { Name = p.Name }).ToList(),
-            RepresentativeCompanies = p.RepresentativeCompanies?.Select(r => new RepresentativeCompanyDto
+                return MapToDto(participant);
+            }
+            catch (Exception)
             {
-                Name = r.Name,
-                Country = r.Country,
-                Address = r.Address,
-                District = r.District,
-                City = r.City,
-                Phone = r.Phone,
-                Email = r.Email,
-                Website = r.Website
-            }).ToList(),
-            LogoFileName = p.LogoFileName,
-            LogoFilePath = p.LogoFilePath,
-            LogoContentType = p.LogoContentType,
-            LogoFileSize = p.LogoFileSize,
-            LogoUploadDate = p.LogoUploadDate
-        };
-
-
+                // Hata durumunda rollback
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
 
         public async Task<ParticipantDto> UpdateAsync(Guid id, UpdateParticipantDto dto)
         {
@@ -124,6 +115,18 @@ namespace FuarYonetimSistemi.Application.Services
 
             if (participant == null || participant.IsDeleted) return null;
 
+            // ✅ Email değişikliği kontrolü (farklı katılımcıda aynı email var mı?)
+            if (participant.Email != dto.Email)
+            {
+                var existingParticipant = await _context.Participants
+                    .FirstOrDefaultAsync(p => p.Email == dto.Email && !p.IsDeleted && p.Id != id);
+
+                if (existingParticipant != null)
+                {
+                    throw new InvalidOperationException($"Bu email adresi ({dto.Email}) ile kayıtlı başka bir katılımcı zaten mevcut.");
+                }
+            }
+
             participant.FullName = dto.FullName;
             participant.Email = dto.Email;
             participant.Phone = dto.Phone;
@@ -132,36 +135,59 @@ namespace FuarYonetimSistemi.Application.Services
             participant.Address = dto.Address;
             participant.Website = dto.Website;
 
-            UpdateCollection(participant.Branches, dto.Branches, (e, d) => e.Name == d.Name, d => new Branch { Name = d.Name }, (e, d) => e.Name = d.Name);
-            UpdateCollection(participant.Brands, dto.Brands, (e, d) => e.Name == d.Name, d => new Brand { Name = d.Name }, (e, d) => e.Name = d.Name);
-            UpdateCollection(participant.ProductCategories, dto.ProductCategories, (e, d) => e.Name == d.Name, d => new ProductCategory { Name = d.Name }, (e, d) => e.Name = d.Name);
-            UpdateCollection(participant.ExhibitedProducts, dto.ExhibitedProducts, (e, d) => e.Name == d.Name, d => new ExhibitedProduct { Name = d.Name }, (e, d) => e.Name = d.Name);
-            UpdateCollection(participant.RepresentativeCompanies, dto.RepresentativeCompanies, (e, d) => e.Name == d.Name && e.Country == d.Country, d => new RepresentativeCompany
-            {
-                Name = d.Name,
-                Country = d.Country,
-                Address = d.Address,
-                District = d.District,
-                City = d.City,
-                Phone = d.Phone,
-                Email = d.Email,
-                Website = d.Website
-            }, (e, d) =>
-            {
-                e.Name = d.Name;
-                e.Country = d.Country;
-                e.Address = d.Address;
-                e.District = d.District;
-                e.City = d.City;
-                e.Phone = d.Phone;
-                e.Email = d.Email;
-                e.Website = d.Website;
-            });
+            // ✅ UpdateCollection çağrılarını düzelt - DTO tiplerini kullan
+            UpdateCollection(participant.Branches, dto.Branches,
+                (e, d) => e.Name == d.Name,
+                d => new Branch { Name = d.Name },
+                (e, d) => e.Name = d.Name);
 
+            UpdateCollection(participant.Brands, dto.Brands,
+                (e, d) => e.Name == d.Name,
+                d => new Brand { Name = d.Name },
+                (e, d) => e.Name = d.Name);
+
+            UpdateCollection(participant.ProductCategories, dto.ProductCategories,
+                (e, d) => e.Name == d.Name,
+                d => new ProductCategory { Name = d.Name },
+                (e, d) => e.Name = d.Name);
+
+            UpdateCollection(participant.ExhibitedProducts, dto.ExhibitedProducts,
+                (e, d) => e.Name == d.Name,
+                d => new ExhibitedProduct { Name = d.Name },
+                (e, d) => e.Name = d.Name);
+
+            UpdateCollection(participant.RepresentativeCompanies, dto.RepresentativeCompanies,
+                (e, d) => e.Name == d.Name && e.Country == d.Country,
+                d => new RepresentativeCompany
+                {
+                    Name = d.Name,
+                    Country = d.Country,
+                    Address = d.Address,
+                    District = d.District,
+                    City = d.City,
+                    Phone = d.Phone,
+                    Email = d.Email,
+                    Website = d.Website
+                },
+                (e, d) =>
+                {
+                    e.Name = d.Name;
+                    e.Country = d.Country;
+                    e.Address = d.Address;
+                    e.District = d.District;
+                    e.City = d.City;
+                    e.Phone = d.Phone;
+                    e.Email = d.Email;
+                    e.Website = d.Website;
+                });
+
+            // Logo işlemleri
             if (dto.RemoveLogo && !string.IsNullOrEmpty(participant.LogoFilePath))
             {
                 await _fileService.DeleteFileAsync(participant.LogoFilePath);
-                participant.LogoFileName = participant.LogoFilePath = participant.LogoContentType = string.Empty;
+                participant.LogoFileName = string.Empty;
+                participant.LogoFilePath = string.Empty;
+                participant.LogoContentType = string.Empty;
                 participant.LogoFileSize = 0;
                 participant.LogoUploadDate = null;
             }
@@ -181,7 +207,15 @@ namespace FuarYonetimSistemi.Application.Services
 
             if (!string.IsNullOrEmpty(participant.LogoFilePath))
             {
-                await _fileService.DeleteFileAsync(participant.LogoFilePath);
+                try
+                {
+                    await _fileService.DeleteFileAsync(participant.LogoFilePath);
+                }
+                catch (Exception)
+                {
+                    // Log error but continue with soft delete
+                    // File might already be deleted or service unavailable
+                }
             }
 
             participant.IsDeleted = true;
@@ -241,7 +275,9 @@ namespace FuarYonetimSistemi.Application.Services
             }
             if (filter.HasLogo.HasValue)
             {
-                query = filter.HasLogo.Value ? query.Where(p => !string.IsNullOrEmpty(p.LogoFilePath)) : query.Where(p => string.IsNullOrEmpty(p.LogoFilePath));
+                query = filter.HasLogo.Value
+                    ? query.Where(p => !string.IsNullOrEmpty(p.LogoFilePath))
+                    : query.Where(p => string.IsNullOrEmpty(p.LogoFilePath));
             }
 
             query = filter.SortBy?.ToLower() switch
@@ -255,37 +291,123 @@ namespace FuarYonetimSistemi.Application.Services
 
             var totalCount = await query.CountAsync();
             var items = await query.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize).ToListAsync();
-            return new PagedResult<ParticipantDto> { Items = items.Select(MapToDto), TotalCount = totalCount };
+
+            return new PagedResult<ParticipantDto>
+            {
+                Items = items.Select(MapToDto),
+                TotalCount = totalCount,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
         public async Task<byte[]> GetLogoAsync(Guid id)
         {
             var participant = await _context.Participants.FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
-            return (participant == null || !_fileService.FileExists(participant.LogoFilePath)) ? null : await _fileService.GetFileContentAsync(participant.LogoFilePath);
+            return (participant == null || string.IsNullOrEmpty(participant.LogoFilePath) || !_fileService.FileExists(participant.LogoFilePath))
+                ? null
+                : await _fileService.GetFileContentAsync(participant.LogoFilePath);
         }
 
+        // ✅ TEK HandleLogoUpload metodu - duplicate kaldırıldı
         private async Task HandleLogoUpload(IFormFile logoFile, Participant participant, bool deleteOld = false)
         {
+            // Double validation (controller'da da yapılıyor ama güvenlik için)
             if (logoFile.Length > 1024 * 1024)
-                throw new Exception("Logo dosya boyutu 1 MB'dan büyük olamaz.");
+                throw new InvalidOperationException("Logo dosya boyutu 1 MB'dan büyük olamaz.");
 
-            using var imageStream = logoFile.OpenReadStream();
-            using var image = await Image.LoadAsync(imageStream);
-            if (image.Width > 500 || image.Height > 300)
-                throw new Exception("Logo maksimum 500x300 piksel olmalıdır.");
+            try
+            {
+                using var imageStream = logoFile.OpenReadStream();
+                using var image = await Image.LoadAsync(imageStream);
 
+                if (image.Width > 500 || image.Height > 300)
+                    throw new InvalidOperationException("Logo maksimum 500x300 piksel olmalıdır.");
+            }
+            catch (Exception ex) when (!(ex is InvalidOperationException))
+            {
+                throw new InvalidOperationException("Geçersiz resim dosyası.", ex);
+            }
+
+            // Eski logo varsa sil
             if (deleteOld && !string.IsNullOrEmpty(participant.LogoFilePath))
-                await _fileService.DeleteFileAsync(participant.LogoFilePath);
+            {
+                try
+                {
+                    await _fileService.DeleteFileAsync(participant.LogoFilePath);
+                }
+                catch (Exception)
+                {
+                    // Log error but don't fail the upload
+                    // _logger.LogWarning(ex, "Eski logo dosyası silinemedi: {FilePath}", participant.LogoFilePath);
+                }
+            }
 
-            var (fileName, filePath, fileSize) = await _fileService.UploadFileAsync(logoFile, "participant-logos");
-            participant.LogoFileName = fileName;
-            participant.LogoFilePath = filePath;
-            participant.LogoContentType = logoFile.ContentType;
-            participant.LogoFileSize = fileSize;
-            participant.LogoUploadDate = DateTime.UtcNow;
+            try
+            {
+                var (fileName, filePath, fileSize) = await _fileService.UploadFileAsync(logoFile, "participant-logos");
+
+                participant.LogoFileName = fileName;
+                participant.LogoFilePath = filePath;
+                participant.LogoContentType = logoFile.ContentType;
+                participant.LogoFileSize = fileSize;
+                participant.LogoUploadDate = DateTime.UtcNow;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Logo dosyası kaydedilemedi.", ex);
+            }
         }
 
-     
+        // ✅ MapToDto metodunu düzelt - Id mapping ekle
+        private ParticipantDto MapToDto(Participant p)
+        {
+            var baseUrl = _httpContextAccessor.HttpContext?.Request != null
+                ? $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}"
+                : "";
+
+            return new ParticipantDto
+            {
+                Id = p.Id,
+                FullName = p.FullName,
+                Email = p.Email,
+                Phone = p.Phone,
+                AuthFullName = p.AuthFullName,
+                CompanyName = p.CompanyName,
+                Address = p.Address,
+                Website = p.Website,
+                CreateDate = p.CreateDate,
+
+                // ✅ Id'lerle birlikte mapping
+                Branches = p.Branches?.Select(b => new BranchDto { Id = b.Id, Name = b.Name }).ToList(),
+                Brands = p.Brands?.Select(b => new BrandDto { Id = b.Id, Name = b.Name }).ToList(),
+                ProductCategories = p.ProductCategories?.Select(c => new ProductCategoryDto { Id = c.Id, Name = c.Name }).ToList(),
+                ExhibitedProducts = p.ExhibitedProducts?.Select(e => new ExhibitedProductDto { Id = e.Id, Name = e.Name }).ToList(),
+                RepresentativeCompanies = p.RepresentativeCompanies?.Select(r => new RepresentativeCompanyDto
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Country = r.Country,
+                    Address = r.Address,
+                    District = r.District,
+                    City = r.City,
+                    Phone = r.Phone,
+                    Email = r.Email,
+                    Website = r.Website
+                }).ToList(),
+
+                LogoFileName = p.LogoFileName,
+                LogoFilePath = p.LogoFilePath,
+                LogoContentType = p.LogoContentType,
+                LogoFileSize = p.LogoFileSize,
+                LogoUploadDate = p.LogoUploadDate,
+
+                // ✅ Computed properties
+                LogoUrl = !string.IsNullOrEmpty(p.LogoFilePath)
+                    ? $"{baseUrl}/api/participants/{p.Id}/logo"
+                    : null
+            };
+        }
 
         private void UpdateCollection<TEntity, TDto>(
             ICollection<TEntity> existing,
@@ -295,14 +417,18 @@ namespace FuarYonetimSistemi.Application.Services
             Action<TEntity, TDto> update) where TEntity : class
         {
             updated ??= new List<TDto>();
+
             var toRemove = existing.Where(e => !updated.Any(d => comparer(e, d))).ToList();
-            foreach (var item in toRemove) existing.Remove(item);
+            foreach (var item in toRemove)
+                existing.Remove(item);
 
             foreach (var dto in updated)
             {
                 var entity = existing.FirstOrDefault(e => comparer(e, dto));
-                if (entity == null) existing.Add(create(dto));
-                else update(entity, dto);
+                if (entity == null)
+                    existing.Add(create(dto));
+                else
+                    update(entity, dto);
             }
         }
     }

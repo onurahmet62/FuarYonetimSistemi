@@ -9,8 +9,7 @@ namespace FuarYonetimSistemi.Application.DTOs
 {
     public class ParticipantUpdateDto
     {
-        public class UpdateParticipantDto
-        {
+       
             public string FullName { get; set; }
             public string Email { get; set; }
             public string Phone { get; set; }
@@ -27,7 +26,7 @@ namespace FuarYonetimSistemi.Application.DTOs
             public ICollection<ProductCategoryDto> ProductCategories { get; set; } = new List<ProductCategoryDto>();
             public ICollection<ExhibitedProductDto> ExhibitedProducts { get; set; } = new List<ExhibitedProductDto>();
             public ICollection<RepresentativeCompanyDto> RepresentativeCompanies { get; set; } = new List<RepresentativeCompanyDto>();
-        }
+       
 
     }
 }

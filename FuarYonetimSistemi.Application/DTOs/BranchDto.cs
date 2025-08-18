@@ -8,7 +8,7 @@ namespace FuarYonetimSistemi.Application.DTOs
 {
     public class BranchDto
     {
-        public string Name { get; set; }
-        // Potentially other properties if your Branch entity has them and you need to map them
+        public int Id { get; set; } // ✅ Id alanı eklendi
+        public string Name { get; set; } = string.Empty;
     }
 }

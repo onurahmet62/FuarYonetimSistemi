@@ -23,22 +23,22 @@ namespace FuarYonetimSistemi.Domain.Entities
         public string CompanyName { get; set; } = string.Empty;
 
         [MaxLength(300)]
-        public string Address { get; set; } = string.Empty;
+        public string? Address { get; set; }
 
         [MaxLength(250)]
-        public string Website { get; set; } = string.Empty;
+        public string? Website { get; set; }
 
         [MaxLength(150)]
-        public string AuthFullName { get; set; } = string.Empty;
+        public string? AuthFullName { get; set; }
 
         [MaxLength(500)]
-        public string? LogoFileName { get; set; } = string.Empty;
+        public string? LogoFileName { get; set; }
 
         [MaxLength(500)]
-        public string? LogoFilePath { get; set; } = string.Empty;
+        public string? LogoFilePath { get; set; }
 
         [MaxLength(100)]
-        public string? LogoContentType { get; set; } = string.Empty;
+        public string? LogoContentType { get; set; }
 
         public long LogoFileSize { get; set; } = 0;
 

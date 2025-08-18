@@ -78,17 +78,15 @@ namespace FuarYonetimSistemi.Domain.Entities
         public bool IsDeleted { get; set; } = false;
 
         // Foreign Keys
-        [Required]
-        public Guid ParticipantId { get; set; }
+        public Guid? ParticipantId { get; set; }
 
         [JsonIgnore]
-        public Participant Participant { get; set; }
+        public Participant? Participant { get; set; }
 
-        [Required]
-        public Guid FairId { get; set; }
+        public Guid? FairId { get; set; }
 
         [JsonIgnore]
-        public Fair Fair { get; set; }
+        public Fair? Fair { get; set; }
 
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }

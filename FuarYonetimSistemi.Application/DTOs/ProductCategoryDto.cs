@@ -8,6 +8,7 @@ namespace FuarYonetimSistemi.Application.DTOs
 {
     public class ProductCategoryDto
     {
-        public string Name { get; set; }
+        public int Id { get; set; } // ✅ Id alanı eklendi
+        public string Name { get; set; } = string.Empty;
     }
 }

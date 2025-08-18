@@ -5,6 +5,7 @@ using FuarYonetimSistemi.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,61 +32,147 @@ namespace FuarYonetimSistemi.API.Controllers
         public async Task<IActionResult> GetAll()
             => Ok(await _participantService.GetAllAsync());
 
+        // ✅ Düzeltilmiş Controller POST Metodu
         [HttpPost]
         [Consumes("multipart/form-data")]
+        [SwaggerOperation(
+            Summary = "Yeni katılımcı oluştur",
+            Description = "Fuar sistemine yeni bir katılımcı ekler. Logo dosyası, şube, marka, ürün kategorisi ve temsilci firma bilgileri ile birlikte kayıt yapılabilir.",
+            OperationId = "CreateParticipant"
+        )]
+        [SwaggerResponse(201, "Katılımcı başarıyla oluşturuldu", typeof(ParticipantDto))]
+        [SwaggerResponse(400, "Geçersiz veri")]
+        [SwaggerResponse(500, "Sunucu hatası")]
         public async Task<IActionResult> Create([FromForm] CreateParticipantDto dto)
         {
             try
             {
-                // JSON string'leri listeye çevir
-                dto.Branches = ParseJsonList<CreateBranchDto>(dto.BranchesJson);
-                dto.Brands = ParseJsonList<CreateBrandDto>(dto.BrandsJson);
-                dto.ProductCategories = ParseJsonList<CreateProductCategoryDto>(dto.ProductCategoriesJson);
-                dto.ExhibitedProducts = ParseJsonList<CreateExhibitedProductDto>(dto.ExhibitedProductsJson);
-                dto.RepresentativeCompanies = ParseJsonList<CreateRepresentativeCompanyDto>(dto.RepresentativeCompaniesJson);
+                // ✅ Model validation kontrolü
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                // ✅ Logo validation (service'ten önce)
+                if (dto.LogoFile != null)
+                {
+                    var logoValidation = ValidateLogoFile(dto.LogoFile);
+                    if (!logoValidation.IsValid)
+                    {
+                        return BadRequest(new { message = logoValidation.ErrorMessage });
+                    }
+                }
+
+                // ✅ JSON parsing ile daha iyi error handling
+                try
+                {
+                    dto.Branches = ParseJsonList<CreateBranchDto>(dto.BranchesJson);
+                    dto.Brands = ParseJsonList<CreateBrandDto>(dto.BrandsJson);
+                    dto.ProductCategories = ParseJsonList<CreateProductCategoryDto>(dto.ProductCategoriesJson);
+                    dto.ExhibitedProducts = ParseJsonList<CreateExhibitedProductDto>(dto.ExhibitedProductsJson);
+                    dto.RepresentativeCompanies = ParseJsonList<CreateRepresentativeCompanyDto>(dto.RepresentativeCompaniesJson);
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest(new { message = "JSON formatı geçersiz", detail = ex.Message });
+                }
 
                 var participant = await _participantService.CreateAsync(dto);
                 return CreatedAtAction(nameof(GetById), new { id = participant.Id }, participant);
             }
-            catch (ArgumentException ex)
+            catch (InvalidOperationException ex)
             {
+                // Business logic hataları (duplicate email vb.)
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                // Log the error (ILogger kullanılmalı)
                 return StatusCode(500, new
                 {
                     message = "Katılımcı oluşturulurken bir hata oluştu.",
-                    detail = ex.Message,
-                    stack = ex.StackTrace
+                    detail = ex.Message
                 });
             }
         }
 
+        // ✅ Logo validation helper metodu
+        private (bool IsValid, string ErrorMessage) ValidateLogoFile(IFormFile logoFile)
+        {
+            const int MaxFileSizeBytes = 1024 * 1024; // 1MB
+            const int MaxWidth = 500;
+            const int MaxHeight = 300;
 
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var allowedMimeTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif" };
 
+            // Dosya boyutu kontrolü
+            if (logoFile.Length > MaxFileSizeBytes)
+            {
+                return (false, "Logo dosya boyutu 1 MB'dan büyük olamaz.");
+            }
 
+            // Dosya uzantısı kontrolü
+            var fileExtension = Path.GetExtension(logoFile.FileName)?.ToLowerInvariant();
+            if (string.IsNullOrEmpty(fileExtension) || !allowedExtensions.Contains(fileExtension))
+            {
+                return (false, "Desteklenmeyen dosya formatı. Sadece JPG, PNG ve GIF dosyaları kabul edilir.");
+            }
 
+            // MIME type kontrolü
+            if (!allowedMimeTypes.Contains(logoFile.ContentType?.ToLowerInvariant()))
+            {
+                return (false, "Geçersiz dosya tipi. Sadece resim dosyaları kabul edilir.");
+            }
 
+            // Dosya adı kontrolü
+            if (string.IsNullOrWhiteSpace(logoFile.FileName))
+            {
+                return (false, "Geçerli bir dosya adı gereklidir.");
+            }
+
+            return (true, string.Empty);
+        }
+
+        // ✅ Geliştirilmiş JSON parsing
         private static List<T>? ParseJsonList<T>(string? json)
         {
-            if (string.IsNullOrWhiteSpace(json)) return null;
+            if (string.IsNullOrWhiteSpace(json))
+                return null;
 
             try
             {
-                if (json.TrimStart().StartsWith("{"))
+                // Trim ve basic validation
+                json = json.Trim();
+
+                if (json.StartsWith("{") && json.EndsWith("}"))
                 {
+                    // Tek obje
                     var single = JsonConvert.DeserializeObject<T>(json);
                     return single != null ? new List<T> { single } : null;
                 }
-
-                return JsonConvert.DeserializeObject<List<T>>(json);
+                else if (json.StartsWith("[") && json.EndsWith("]"))
+                {
+                    // Array
+                    return JsonConvert.DeserializeObject<List<T>>(json);
+                }
+                else
+                {
+                    throw new ArgumentException($"JSON formatı geçersiz. Obje {{}} veya array [] bekleniyor: {json}");
+                }
             }
             catch (JsonException ex)
             {
-                throw new ArgumentException($"Geçersiz JSON formatı: {ex.Message}");
+                throw new ArgumentException($"JSON parse hatası: {ex.Message}. Alınan veri: {json}", ex);
             }
         }
+
+
+
+
+
+
+      
 
 
 
@@ -96,6 +183,15 @@ namespace FuarYonetimSistemi.API.Controllers
 
         [HttpPut("{id}")]
         [Consumes("multipart/form-data")]
+        [SwaggerOperation(
+            Summary = "Katılımcı bilgilerini güncelle",
+            Description = "Mevcut katılımcının bilgilerini günceller. Logo dosyası ve diğer tüm bilgiler değiştirilebilir.",
+            OperationId = "UpdateParticipant"
+        )]
+        [SwaggerResponse(200, "Katılımcı başarıyla güncellendi", typeof(ParticipantDto))]
+        [SwaggerResponse(400, "Geçersiz veri")]
+        [SwaggerResponse(404, "Katılımcı bulunamadı")]
+        [SwaggerResponse(500, "Sunucu hatası")]
         public async Task<IActionResult> Update(Guid id, [FromForm] UpdateParticipantDto dto)
         {
             try

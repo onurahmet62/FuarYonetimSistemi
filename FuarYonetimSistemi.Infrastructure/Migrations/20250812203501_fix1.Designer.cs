@@ -4,6 +4,7 @@ using FuarYonetimSistemi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FuarYonetimSistemi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250812203501_fix1")]
+    partial class fix1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -641,7 +644,7 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid?>("FairId")
+                    b.Property<Guid>("FairId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
@@ -657,7 +660,7 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<Guid?>("ParticipantId")
+                    b.Property<Guid>("ParticipantId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal?>("ReceivablesInLaw")
@@ -902,12 +905,14 @@ namespace FuarYonetimSistemi.Infrastructure.Migrations
                     b.HasOne("FuarYonetimSistemi.Domain.Entities.Fair", "Fair")
                         .WithMany("Stands")
                         .HasForeignKey("FairId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("FuarYonetimSistemi.Domain.Entities.Participant", "Participant")
                         .WithMany("Stands")
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Fair");
 
