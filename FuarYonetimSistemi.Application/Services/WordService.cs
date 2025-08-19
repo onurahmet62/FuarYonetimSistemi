@@ -85,26 +85,8 @@ namespace FuarYonetimSistemi.Infrastructure.Services
                 AddParagraph(body, "Sayın katılımcımız, sadece firmanıza ait markalarınızı paylaşmanızı önemle rica ederiz; firmanıza ait olmayan markalara kesinlikle yer verilmeyecektir.");
                 AddEmptyLine(body);
 
-                // Markalar listesi
-                if (participant.Brands != null && participant.Brands.Any())
-                {
-                    for (int i = 0; i < participant.Brands.Count && i < 10; i++)
-                    {
-                        AddNumberedLine(body, i + 1, participant.Brands.ElementAt(i).Name);
-                    }
-                    // Kalan boş satırlar
-                    for (int i = participant.Brands.Count; i < 10; i++)
-                    {
-                        AddNumberedLine(body, i + 1, "");
-                    }
-                }
-                else
-                {
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        AddNumberedLine(body, i, "");
-                    }
-                }
+                // Markalar tablosu formatı (Word dosyasındaki gibi)
+                CreateTableForList(body, participant.Brands?.Select(b => b.Name).ToList(), 10);
 
                 // Ürün Grupları Bölümü
                 AddEmptyLine(body);
@@ -113,38 +95,18 @@ namespace FuarYonetimSistemi.Infrastructure.Services
                 AddParagraph(body, "Ürün grupları sınıflandırılması:");
                 AddEmptyLine(body);
 
-                // Ürün kategorileri
-                var productCategories = new[]
+                // Ürün Grupları - Sadece katılımcının ProductCategory tablosundaki veriler gösterilecek
+                if (participant.ProductCategories != null && participant.ProductCategories.Any())
                 {
-                    "Tarımsal Mekanizasyon Ve Teknolojileri",
-                    "Hayvansal Üretim Makineleri",
-                    "Sera Teknolojileri",
-                    "Su ve Sulama Teknolojileri",
-                    "Gübreler",
-                    "Zirai İlaçlar",
-                    "Tohum, Fide, Fidan, Bahçecilik",
-                    "Çiçekçilik Ve İlgili Teknolojiler",
-                    "Ekolojik Tarım",
-                    "Bağcılık Ve Şarapçılık İle İlgili Teknolojiler",
-                    "Hayvan Sağlığı Ve Veterinerlik Hizmetleri, İlaçları Ve Ekipmanları",
-                    "Sektörel Kamu Kurum Ve Kuruluşları",
-                    "Diğer"
-                };
-
-                foreach (var category in productCategories)
-                {
-                    bool isSelected = participant.ProductCategories?.Any(pc => pc.Name.Contains(category)) ?? false;
-                    string marker = isSelected ? "******" : "      ";
-                    AddParagraph(body, $"{marker}   {category}");
+                    foreach (var category in participant.ProductCategories)
+                    {
+                        AddParagraph(body, $"******   {category.Name}");
+                    }
                 }
-
-                // Diğer kategorisinde özel ürünler varsa
-                var otherProducts = participant.ProductCategories?.Where(pc =>
-                    !productCategories.Any(cat => pc.Name.Contains(cat)))?.ToList();
-                if (otherProducts?.Any() == true)
+                else
                 {
-                    var otherProductsText = string.Join(" ", otherProducts.Select(p => p.Name));
-                    AddParagraph(body, $"******   Diğer {otherProductsText}");
+                    // Hiç kategori seçilmemişse boş bırak
+                    AddParagraph(body, "Seçili kategori yok.");
                 }
 
                 // Firma Temsilcilik Bölümü
@@ -190,16 +152,26 @@ namespace FuarYonetimSistemi.Infrastructure.Services
                 AddSectionHeader(body, "FUARDA SERGİLENECEK ÜRÜNLER");
                 AddEmptyLine(body);
 
+                // Sergilenecek Ürünler - ExhibitedProducts tablosundan getir
                 if (participant.ExhibitedProducts != null && participant.ExhibitedProducts.Any())
                 {
+                    int productIndex = 1;
                     foreach (var product in participant.ExhibitedProducts)
                     {
-                        AddParagraph(body, $"• {product.Name}");
+                        AddParagraph(body, $"{productIndex}. {product.Name}");
+                        productIndex++;
+                    }
+
+                    // Kalan boş satırları ekle (toplam 15 satır olacak şekilde)
+                    for (int i = productIndex; i <= 15; i++)
+                    {
+                        AddParagraph(body, $"{i}. ");
                     }
                 }
                 else
                 {
-                    for (int i = 1; i <= 10; i++)
+                    // Hiç ürün yoksa 15 boş satır
+                    for (int i = 1; i <= 15; i++)
                     {
                         AddParagraph(body, $"{i}. ");
                     }
@@ -341,6 +313,75 @@ namespace FuarYonetimSistemi.Infrastructure.Services
             run.AppendChild(new Break() { Type = BreakValues.Page });
             paragraph.AppendChild(run);
             body.AppendChild(paragraph);
+        }
+
+        private void CreateTableForList(Body body, List<string> items, int maxRows)
+        {
+            // Tablo oluştur
+            var table = new Table();
+
+            // Tablo özellikleri
+            var tableProperties = new TableProperties(
+                new TableBorders(
+                    new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+                    new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+                    new LeftBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+                    new RightBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+                    new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+                    new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 }
+                )
+            );
+            table.AppendChild(tableProperties);
+
+            // Satırları oluştur (2 sütunlu tablo)
+            for (int i = 0; i < maxRows; i += 2)
+            {
+                var tableRow = new TableRow();
+
+                // Sol sütun
+                var leftCell = new TableCell();
+                var leftCellPara = new OpenXmlParagraph();
+                var leftRun = new Run();
+
+                string leftContent = "";
+                if (i < maxRows)
+                {
+                    if (items != null && i < items.Count && !string.IsNullOrEmpty(items[i]))
+                        leftContent = $"{i + 1}    {items[i]}";
+                    else
+                        leftContent = $"{i + 1}    ";
+                }
+
+                leftRun.AppendChild(new OpenXmlText(leftContent));
+                leftCellPara.AppendChild(leftRun);
+                leftCell.AppendChild(leftCellPara);
+                leftCell.AppendChild(new TableCellProperties(new TableCellWidth() { Type = TableWidthUnitValues.Pct, Width = "50" }));
+                tableRow.AppendChild(leftCell);
+
+                // Sağ sütun
+                var rightCell = new TableCell();
+                var rightCellPara = new OpenXmlParagraph();
+                var rightRun = new Run();
+
+                string rightContent = "";
+                if (i + 1 < maxRows)
+                {
+                    if (items != null && i + 1 < items.Count && !string.IsNullOrEmpty(items[i + 1]))
+                        rightContent = $"{i + 2}    {items[i + 1]}";
+                    else
+                        rightContent = $"{i + 2}    ";
+                }
+
+                rightRun.AppendChild(new OpenXmlText(rightContent));
+                rightCellPara.AppendChild(rightRun);
+                rightCell.AppendChild(rightCellPara);
+                rightCell.AppendChild(new TableCellProperties(new TableCellWidth() { Type = TableWidthUnitValues.Pct, Width = "50" }));
+                tableRow.AppendChild(rightCell);
+
+                table.AppendChild(tableRow);
+            }
+
+            body.AppendChild(table);
         }
 
         #endregion
