@@ -73,6 +73,7 @@ builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<ISharedFileService, SharedFileService>();
+builder.Services.AddScoped<IWordService, WordService>();
 
 
 builder.Services.AddHttpContextAccessor();

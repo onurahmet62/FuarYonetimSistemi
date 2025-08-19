@@ -20,6 +20,15 @@ namespace FuarYonetimSistemi.Application.Interfaces
 
         // Logo işlemleri
         Task<byte[]> GetLogoAsync(Guid participantId);
+
+        // IParticipantService interface'ine eklenecek metod:
+
+        /// <summary>
+        /// Belirli bir fuara katılan katılımcıları getir
+        /// </summary>
+        /// <param name="fairId">Fuar ID'si</param>
+        /// <returns>Fuara katılan katılımcılar</returns>
+        Task<IEnumerable<ParticipantDto>> GetByFairIdAsync(Guid fairId);
     }
 
 }

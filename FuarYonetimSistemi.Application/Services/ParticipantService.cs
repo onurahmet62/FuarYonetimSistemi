@@ -431,5 +431,79 @@ namespace FuarYonetimSistemi.Application.Services
                     update(entity, dto);
             }
         }
+
+        public async Task<IEnumerable<ParticipantDto>> GetByFairIdAsync(Guid fairId)
+        {
+            return await _context.Stands
+                .Include(s => s.Participant)
+                    .ThenInclude(p => p.Branches)
+                .Include(s => s.Participant)
+                    .ThenInclude(p => p.Brands)
+                .Include(s => s.Participant)
+                    .ThenInclude(p => p.ProductCategories)
+                .Include(s => s.Participant)
+                    .ThenInclude(p => p.RepresentativeCompanies)
+                .Include(s => s.Participant)
+                    .ThenInclude(p => p.ExhibitedProducts)
+                .Where(s => s.FairId == fairId && !s.Participant.IsDeleted)
+                .Select(s => s.Participant)
+                .Distinct()
+                .Select(p => new ParticipantDto
+                {
+                    Id = p.Id,
+                    FullName = p.FullName,
+                    Email = p.Email,
+                    Phone = p.Phone,
+                    CompanyName = p.CompanyName,
+                    Address = p.Address,
+                    Website = p.Website,
+                    AuthFullName = p.AuthFullName,
+                    LogoFileName = p.LogoFileName,
+                    LogoFilePath = p.LogoFilePath,
+                    LogoContentType = p.LogoContentType,
+                    LogoFileSize = p.LogoFileSize,
+                    LogoUploadDate = p.LogoUploadDate,
+                    CreateDate = p.CreateDate,
+
+                    // Navigation Properties
+                    Branches = p.Branches.Select(b => new BranchDto
+                    {
+                        Id = b.Id,
+                        Name = b.Name
+                    }).ToList(),
+
+                    Brands = p.Brands.Select(br => new BrandDto
+                    {
+                        Id = br.Id,
+                        Name = br.Name
+                    }).ToList(),
+
+                    ProductCategories = p.ProductCategories.Select(pc => new ProductCategoryDto
+                    {
+                        Id = pc.Id,
+                        Name = pc.Name
+                    }).ToList(),
+
+                    RepresentativeCompanies = p.RepresentativeCompanies.Select(rc => new RepresentativeCompanyDto
+                    {
+                        Id = rc.Id,
+                        Name = rc.Name,
+                        Country = rc.Country,
+                        Address = rc.Address,
+                        District = rc.District,
+                        City = rc.City,
+                        Phone = rc.Phone,
+                        Email = rc.Email,
+                        Website = rc.Website
+                    }).ToList(),
+
+                    ExhibitedProducts = p.ExhibitedProducts.Select(ep => new ExhibitedProductDto
+                    {
+                        Id = ep.Id,
+                        Name = ep.Name
+                    }).ToList()
+                })
+                .ToListAsync();
+        }
     }
 }
