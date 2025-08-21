@@ -1,4 +1,5 @@
-﻿using FuarYonetimSistemi.Application.Interfaces;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using FuarYonetimSistemi.Application.Interfaces;
 using FuarYonetimSistemi.Application.Services;
 using FuarYonetimSistemi.Infrastructure.Data;
 using FuarYonetimSistemi.Infrastructure.Services;
@@ -74,7 +75,7 @@ builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<ISharedFileService, SharedFileService>();
 builder.Services.AddScoped<IWordService, WordService>();
-
+builder.Services.AddScoped<IWorkTaskService, WorkTaskService>();
 
 builder.Services.AddHttpContextAccessor();
 
