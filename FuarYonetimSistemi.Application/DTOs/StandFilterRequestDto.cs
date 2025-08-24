@@ -14,24 +14,18 @@ namespace FuarYonetimSistemi.Application.DTOs
         public DateTime? ActualDueDate { get; set; }
         public Guid? ParticipantId { get; set; }
         public Guid? FairId { get; set; }
-        public string? SalesRepresentative { get; set; }
 
+        // Sales Representative filtreleri
+        public Guid? SalesRepresentativeId { get; set; }
+        public string? SalesRepresentativeName { get; set; }
+
+        // Sorting
         public string? SortBy { get; set; }
         public bool IsDescending { get; set; } = false;
 
-        private int _pageNumber = 1;
-        public int PageNumber
-        {
-            get => _pageNumber <= 0 ? 1 : _pageNumber;
-            set => _pageNumber = value;
-        }
-
-        private int _pageSize = 10;
-        public int PageSize
-        {
-            get => _pageSize <= 0 ? 10 : _pageSize;
-            set => _pageSize = value;
-        }
+        // Pagination
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
     }
 
 

@@ -49,7 +49,7 @@ namespace FuarYonetimSistemi.Infrastructure.Data
             modelBuilder.Entity<Fair>().Property(p => p.ActualExpense).HasPrecision(18, 2);
             #endregion
 
-            #region Relationships: Stand <-> Fair & Participant
+            #region Relationships: Stand <-> Fair & Participant & SalesRepresentative
             modelBuilder.Entity<Stand>()
                 .HasOne(s => s.Participant)
                 .WithMany(p => p.Stands)
@@ -61,6 +61,13 @@ namespace FuarYonetimSistemi.Infrastructure.Data
                 .WithMany(f => f.Stands)
                 .HasForeignKey(s => s.FairId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Sales Representative ilişkisi
+            modelBuilder.Entity<Stand>()
+                .HasOne(s => s.SalesRepresentative)
+                .WithMany()
+                .HasForeignKey(s => s.SalesRepresentativeId)
+                .OnDelete(DeleteBehavior.Restrict);
             #endregion
 
             #region Soft Delete Filters
@@ -238,6 +245,41 @@ namespace FuarYonetimSistemi.Infrastructure.Data
             modelBuilder.Entity<WorkTaskComment>()
                 .HasIndex(tc => tc.WorkTaskId)
                 .HasDatabaseName("IX_WorkTaskComments_WorkTaskId");
+
+            #endregion
+
+            #region Sales Statistics Performance Indexes
+
+            // Stand tablosu için satış istatistikleri optimizasyonu
+            modelBuilder.Entity<Stand>()
+                .HasIndex(s => s.SalesRepresentativeId)
+                .HasDatabaseName("IX_Stands_SalesRepresentativeId");
+
+            modelBuilder.Entity<Stand>()
+                .HasIndex(s => s.ContractDate)
+                .HasDatabaseName("IX_Stands_ContractDate");
+
+            modelBuilder.Entity<Stand>()
+                .HasIndex(s => s.ActualDueDate)
+                .HasDatabaseName("IX_Stands_ActualDueDate");
+
+            modelBuilder.Entity<Stand>()
+                .HasIndex(s => new { s.SalesRepresentativeId, s.ContractDate })
+                .HasDatabaseName("IX_Stands_SalesRep_ContractDate");
+
+            modelBuilder.Entity<Stand>()
+                .HasIndex(s => new { s.FairId, s.SalesRepresentativeId })
+                .HasDatabaseName("IX_Stands_Fair_SalesRep");
+
+            // Payment tablosu için optimizasyon
+            modelBuilder.Entity<Payment>()
+                .HasIndex(p => p.PaymentDate)
+                .HasDatabaseName("IX_Payments_PaymentDate");
+
+            // User tablosu için optimizasyon
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Role)
+                .HasDatabaseName("IX_Users_Role");
 
             #endregion
         }

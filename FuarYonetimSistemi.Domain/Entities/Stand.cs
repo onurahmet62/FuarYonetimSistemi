@@ -69,8 +69,11 @@ namespace FuarYonetimSistemi.Domain.Entities
 
         public DateTime? ContractDate { get; set; }
 
-        [MaxLength(100)]
-        public string SalesRepresentative { get; set; } = string.Empty;
+        // Sales Representative - User ile ilişki
+        public Guid? SalesRepresentativeId { get; set; }
+
+        [JsonIgnore]
+        public User? SalesRepresentative { get; set; }
 
         [MaxLength(1000)]
         public string Note { get; set; } = string.Empty;

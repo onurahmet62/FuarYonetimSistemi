@@ -48,6 +48,8 @@ namespace FuarYonetimSistemi.Application.DTOs
 
         public Guid ParticipantId { get; set; }
         public Guid FairId { get; set; }
+
+        public Guid? SalesRepresentativeId { get; set; }
     }
 
 }

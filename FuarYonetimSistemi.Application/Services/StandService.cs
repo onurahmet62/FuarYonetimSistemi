@@ -27,6 +27,15 @@ namespace FuarYonetimSistemi.Application.Services
             if (participant == null || fair == null)
                 return null;
 
+            // SalesRepresentativeId kontrolü
+            User salesRep = null;
+            if (standCreateDto.SalesRepresentativeId.HasValue)
+            {
+                salesRep = await _context.Users.FindAsync(standCreateDto.SalesRepresentativeId.Value);
+                if (salesRep == null)
+                    return null; // Geçersiz satış temsilcisi
+            }
+
             var stand = new Stand
             {
                 Name = standCreateDto.Name,
@@ -57,8 +66,8 @@ namespace FuarYonetimSistemi.Application.Services
                 BarterBalance = standCreateDto.BarterBalance,
                 ActualDueDate = standCreateDto.ActualDueDate,
                 ContractDate = standCreateDto.ContractDate,
-                SalesRepresentative = standCreateDto.SalesRepresentative ?? string.Empty,
-                Note = standCreateDto.Note ?? string.Empty, // Fix for CS8601: Assign a default value if null
+                SalesRepresentativeId = standCreateDto.SalesRepresentativeId, // User ID olarak
+                Note = standCreateDto.Note ?? string.Empty,
                 ParticipantId = standCreateDto.ParticipantId,
                 FairId = standCreateDto.FairId
             };
@@ -85,7 +94,10 @@ namespace FuarYonetimSistemi.Application.Services
             return await _context.Stands
                 .Include(s => s.Participant)
                 .Include(s => s.Fair)
-                .Where(s => s.Name.Contains(searchTerm) || s.FairHall.Contains(searchTerm))
+                .Include(s => s.SalesRepresentative)
+                .Where(s => s.Name.Contains(searchTerm) || 
+                           s.FairHall.Contains(searchTerm) ||
+                           (s.SalesRepresentative != null && s.SalesRepresentative.FullName.Contains(searchTerm)))
                 .ToListAsync();
         }
 
@@ -94,6 +106,8 @@ namespace FuarYonetimSistemi.Application.Services
             return await _context.Stands
                 .Include(s => s.Participant)
                 .Include(s => s.Fair)
+                .Include(s => s.SalesRepresentative)
+                .Include(s => s.Payments)
                 .ToListAsync();
         }
 
@@ -102,6 +116,8 @@ namespace FuarYonetimSistemi.Application.Services
             return await _context.Stands
                 .Include(s => s.Participant)
                 .Include(s => s.Fair)
+                .Include(s => s.SalesRepresentative)
+                .Include(s => s.Payments)
                 .Where(s => s.FairId == fairId)
                 .ToListAsync();
         }
@@ -111,6 +127,8 @@ namespace FuarYonetimSistemi.Application.Services
             return await _context.Stands
                 .Include(s => s.Participant)
                 .Include(s => s.Fair)
+                .Include(s => s.SalesRepresentative)
+                .Include(s => s.Payments)
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
@@ -119,6 +137,8 @@ namespace FuarYonetimSistemi.Application.Services
             return await _context.Stands
                 .Include(s => s.Participant)
                 .Include(s => s.Fair)
+                .Include(s => s.SalesRepresentative)
+                .Include(s => s.Payments)
                 .Where(s => s.ParticipantId == participantId)
                 .ToListAsync();
         }
@@ -128,6 +148,14 @@ namespace FuarYonetimSistemi.Application.Services
             var stand = await _context.Stands.FindAsync(id);
             if (stand == null)
                 return null;
+
+            // SalesRepresentativeId kontrolü
+            if (updatedStand.SalesRepresentativeId.HasValue)
+            {
+                var salesRep = await _context.Users.FindAsync(updatedStand.SalesRepresentativeId.Value);
+                if (salesRep == null)
+                    return null; // Geçersiz satış temsilcisi
+            }
 
             stand.Name = updatedStand.Name;
             stand.FairHall = updatedStand.FairHall;
@@ -157,7 +185,7 @@ namespace FuarYonetimSistemi.Application.Services
             stand.BarterBalance = updatedStand.BarterBalance;
             stand.ActualDueDate = updatedStand.ActualDueDate;
             stand.ContractDate = updatedStand.ContractDate;
-            stand.SalesRepresentative = updatedStand.SalesRepresentative;
+            stand.SalesRepresentativeId = updatedStand.SalesRepresentativeId; // User ID olarak
             stand.Note = updatedStand.Note;
 
             await _context.SaveChangesAsync();
@@ -168,7 +196,9 @@ namespace FuarYonetimSistemi.Application.Services
         {
             IQueryable<Stand> query = _context.Stands
                 .Include(s => s.Participant)
-                .Include(s => s.Fair);
+                .Include(s => s.Fair)
+                .Include(s => s.SalesRepresentative)
+                .Include(s => s.Payments);
 
             if (!string.IsNullOrWhiteSpace(filter.Name))
                 query = query.Where(s => s.Name.Contains(filter.Name));
@@ -177,12 +207,7 @@ namespace FuarYonetimSistemi.Application.Services
                 query = query.Where(s => s.FairHall.Contains(filter.FairHall));
 
             if (filter.ContractDate.HasValue)
-                if (filter.ContractDate.HasValue)
-                    query = query.Where(s => s.ContractDate.HasValue && s.ContractDate.Value.Date == filter.ContractDate.Value.Date);
-
-            if (filter.ActualDueDate.HasValue)
-                query = query.Where(s => s.ActualDueDate.HasValue && s.ActualDueDate.Value.Date == filter.ActualDueDate.Value.Date);
-              
+                query = query.Where(s => s.ContractDate.HasValue && s.ContractDate.Value.Date == filter.ContractDate.Value.Date);
 
             if (filter.ActualDueDate.HasValue)
                 query = query.Where(s => s.ActualDueDate.HasValue && s.ActualDueDate.Value.Date == filter.ActualDueDate.Value.Date);
@@ -193,8 +218,13 @@ namespace FuarYonetimSistemi.Application.Services
             if (filter.FairId.HasValue)
                 query = query.Where(s => s.FairId == filter.FairId.Value);
 
-            if (!string.IsNullOrWhiteSpace(filter.SalesRepresentative))
-                query = query.Where(s => s.SalesRepresentative.Contains(filter.SalesRepresentative));
+            if (filter.SalesRepresentativeId.HasValue)
+                query = query.Where(s => s.SalesRepresentativeId == filter.SalesRepresentativeId.Value);
+
+            // Satış temsilcisi ismi ile arama
+            if (!string.IsNullOrWhiteSpace(filter.SalesRepresentativeName))
+                query = query.Where(s => s.SalesRepresentative != null && 
+                                        s.SalesRepresentative.FullName.Contains(filter.SalesRepresentativeName));
 
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
@@ -206,7 +236,9 @@ namespace FuarYonetimSistemi.Application.Services
                     "actualduedate" => filter.IsDescending ? query.OrderByDescending(s => s.ActualDueDate) : query.OrderBy(s => s.ActualDueDate),
                     "participantid" => filter.IsDescending ? query.OrderByDescending(s => s.ParticipantId) : query.OrderBy(s => s.ParticipantId),
                     "fairid" => filter.IsDescending ? query.OrderByDescending(s => s.FairId) : query.OrderBy(s => s.FairId),
-                    "salesrepresentative" => filter.IsDescending ? query.OrderByDescending(s => s.SalesRepresentative) : query.OrderBy(s => s.SalesRepresentative),
+                    "salesrepresentative" => filter.IsDescending ? 
+                        query.OrderByDescending(s => s.SalesRepresentative != null ? s.SalesRepresentative.FullName : "") : 
+                        query.OrderBy(s => s.SalesRepresentative != null ? s.SalesRepresentative.FullName : ""),
                     _ => query
                 };
             }
@@ -224,7 +256,21 @@ namespace FuarYonetimSistemi.Application.Services
             return await _context.Stands
                 .Include(s => s.Participant)
                 .Include(s => s.Fair)
+                .Include(s => s.SalesRepresentative)
+                .Include(s => s.Payments)
                 .Where(s => s.ActualDueDate.HasValue && s.ActualDueDate.Value.Date <= targetDate)
+                .ToListAsync();
+        }
+
+        // Yeni metodlar: Satış temsilcisine göre standları getir
+        public async Task<IEnumerable<Stand>> GetBySalesRepresentativeIdAsync(Guid salesRepId)
+        {
+            return await _context.Stands
+                .Include(s => s.Participant)
+                .Include(s => s.Fair)
+                .Include(s => s.SalesRepresentative)
+                .Include(s => s.Payments)
+                .Where(s => s.SalesRepresentativeId == salesRepId)
                 .ToListAsync();
         }
     }
